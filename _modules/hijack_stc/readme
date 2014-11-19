@@ -1,0 +1,8 @@
+hijack_stc - perl module for rejecting connections
+
+
+INSTALLATION:
+
+perl Makefile.PL
+make
+make install

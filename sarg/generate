@@ -1,0 +1,198 @@
+#!/usr/bin/perl
+#Copyright (C) 2003  Didenko A.V.
+#created by Didenko A.V. e-Mail:slivarez@list.ru
+#mod by Sergey S.S. E-mail: brahma@ua.fm
+
+#use Time::localtime;
+use File::Copy cp;
+use FileHandle;
+
+$remove=undef;
+$date_range=$ARGV[0];
+$dir=$ARGV[1];
+$remove=$ARGV[2];
+
+    open cf, "</etc/stc.conf" or die "$!";
+    while($line=<cf>){
+           chomp($line);
+           $line=~ s/#.*//;
+           $line=~ s/[\s\t]{1,}/ /;
+       $line=~ s/^[\s\t]{0,}//;
+           if (!$line)
+                {next;}
+           @parts=split(" ", $line);
+           $var=shift(@parts);
+           @$var=@parts;
+           $$var=$parts[0];
+    }
+    close (cf);
+
+$time_now=localtime;
+open slog, ">>/var/log/sarg_error.log";
+printf slog "\nrun_sarg on $time_now [begin]\n";
+printf slog "Total report creation\n";
+close (slog);
+
+if ($d < 10){
+    $dd="0$d";
+}
+else {
+    $dd="$d";
+}
+if ($m>=10){
+    $mm="$m";
+}
+else{
+    $mm="0$m";
+}
+
+system("cp $SC_path/shablon.conf $SC_path/sarg.conf >> /var/log/sarg_error.log 2>&1");
+system("mkdir -p $reports_dir/$dir/total >> /var/log/sarg_error.log 2>&1");
+open ff, ">>$SC_path/sarg.conf" or die "Can't open conf-file";
+printf ff "\n";
+printf ff "output_dir $reports_dir/$dir/total\n\n";
+close(ff);
+
+#If third param is 'remove' then we should remove daily and weekly reports
+if (($remove eq 'remove') and ($reports_dir ne '/') and $reports_dir){
+    system ("rm -rf $reports_dir/daily/* >> /var/log/sarg_error.log 2>&1");
+    system ("rm -rf $reports_dir/weekly/* >> /var/log/sarg_error.log 2>&1");
+}
+#access.log copy... {
+
+($access_beg, $access_end)=split("-", $date_range);
+($null,$access_beg,$null)=split("/", $access_beg);
+($null,$access_end,$null)=split("/", $access_end);
+$access_beg=int($access_beg);
+$access_end=int($access_end);
+if ($access_beg eq $access_end)
+    {system("cp $access_log.m$access_beg /var/access.log >> /var/log/sarg_error.log 2>&1");}
+else
+    {
+    system("cat $access_log.m$access_beg >> /var/access.log");
+    system("cat $access_log.m$access_end >> /var/access.log");
+    }
+
+#} access.log copy end.
+
+system("$sarg_path/sarg -f $SC_path/sarg.conf -d $date_range -l /var/access.log >> /var/log/sarg_error.log 2>&1");
+	open hta, ">$reports_dir/$dir/total/.htaccess";
+
+        printf hta "AuthType Basic\n";
+	$msg="Enter login and password for admin";
+	printf hta "AuthName \"$msg\"";
+	printf hta "\n";
+        printf hta "AuthUserFile $stc_path/password\n";
+	printf hta "Require user";
+
+	open bf, "<$stc_path/admin.users" or print "Can't open ADMIN file";
+        while (<bf>){
+            @F=split (' ');
+            $b=$F[0];
+	    #$k=@F;
+	    printf hta " $b";
+	}#while bf
+	close (bf);
+
+	printf hta "\n";
+	printf hta "Order allow,deny\n";
+        printf hta "Allow from all\n";
+
+	close (hta);
+
+
+
+for ($i=1;$i<999;++$i){
+    $fl="$stc_path/o$i.users";
+    open fil, "<$fl" or $E='gluk';
+    if ($E ne 'gluk'){
+	open slog, ">>/var/log/sarg_error.log";
+	printf slog "Otdel $i report creation\n";
+	close (slog);
+#	system("mkdir $www_data_path/stat/sarg/$dir/o$i >> /var/log/sarg_tmp.log 2>&1");
+#	system("chown www $www_data_path/stat/$dir/sarg/o$i >> /var/log/sarg_tmp.log 2>&1");
+	system("rm $SC_path/sarg.conf.otd >> /var/log/sarg_tmp.log 2>&1");
+	my $new = FileHandle->new("$SC_path/sarg.conf.otd", "a");
+        my $old = FileHandle->new("$SC_path/shablon.conf", "r");
+        cp ($old, $new);
+
+	open ff, ">>$SC_path/sarg.conf.otd" or die "Can't open conf-file";
+	printf ff "\n\ninclude_users ";
+	printf ff '"';
+	open fo, "<$fl"or die "Can't open $fl";
+
+	while (<fo>){
+	    @F = split (' ');
+	    if($F[0] ne ''){
+    		printf ff "$F[0]";
+		printf ff ":";
+	    }
+	}
+
+	printf ff '"';
+	printf ff "\n";
+	system("mkdir -p $reports_dir/$dir/o$i >> /var/log/sarg_error.log 2>&1");
+	printf ff "output_dir $reports_dir/$dir/o$i\n";
+
+	close(ff);
+	close(fo);
+	system("$sarg_path/sarg -f $SC_path/sarg.conf.otd  -d $date_range -l /var/access.log >> /var/log/sarg_error.log 2>&1");
+
+	open hta, ">$reports_dir/$dir/o$i/.htaccess";
+
+        printf hta "AuthType Basic\n";
+	$msg="Enter login and password for o$i boss";
+	printf hta "AuthName \"$msg\"";
+	printf hta "\n";
+        printf hta "AuthUserFile $stc_path/password\n";
+	printf hta "Require user";
+
+	my $ERR = undef;
+	open bf, "<$stc_path/boss.users" or $ERR='gluck';
+        if (!$ERR){
+	while (<bf>){
+            @F=split (' ');
+            $b=$F[0];
+	    $k=@F;
+	    for ($j=1; $j<($k); ++$j){
+		if ($F[$j] == $i){
+		    printf hta " $b";
+		}
+	    }#for otdel
+	}#while bf
+	close (bf);
+	}#if
+	else{
+	  open bf, "<$stc_path/admin.users" or print "Can't open ADMIN file\n";
+          while (<bf>){
+            @F=split (' ');
+            $b=$F[0];
+	    #$k=@F;
+	    printf hta " $b";
+	  }#while bf
+	  close (bf);
+	}#else
+
+	printf hta "\n";
+	printf hta "Order allow,deny\n";
+        printf hta "Allow from all\n";
+
+	close (hta);
+    }
+    else{
+#	print "BOLT $f\n";
+    }
+    close (fil);
+    $E='q';
+}#for i
+
+system("rm $SC_path/sarg.conf.otd >> /var/log/sarg_tmp.log 2>&1");
+system("rm $SC_path/sarg.conf >> /var/log/sarg_tmp.log 2>&1");
+system("rm /var/access.log >> /var/log/sarg_error.log 2>&1");
+system("rm /var/log/sarg_tmp.log >> /var/log/sarg_error.log 2>&1");
+#print "Report creation complite!\n";
+
+$time_now=localtime;
+open slog, ">>/var/log/sarg_error.log";
+printf slog "run_sarg at $time_now [end]\n";
+close (slog);

@@ -1,0 +1,48 @@
+#!/usr/bin/perl
+#Copyright (C) 2003  Didenko A.V.
+#created by Didenko A.V. e-Mail:slivarez@list.ru
+
+#use Time::localtime;
+
+$error_log="/var/log/stc_error.log";
+
+
+my $fname="/etc/stc.conf";
+if (!-r $fname)
+    {
+    my $time_now = sprintf "%02d.%02d.%04d %02d:%02d:%02d", (localtime)[3], (localtime)[4]+1, (localtime)[5]+1900, (localtime)[2,1,0];
+    $pr=__FILE__." line ".__LINE__." :[ERROR] Cannot open '$fname'";
+    system("echo ".$time_now." - $pr >> $error_log");
+    die "$pr\n";
+    }
+else
+    {
+    open cf, $fname or die "$!";
+    while($line=<cf>){
+        chomp($line);
+        $line=~ s/#.*//;
+        $line=~ s/[\s\t]{1,}/ /;
+        $line=~ s/^[\s\t]{0,}//;
+        if (!$line){next;}
+        @parts=split(" ", $line);
+        $var=shift(@parts);
+        @$var=@parts;
+        $$var=$parts[0];
+    }
+    close (cf);
+}
+
+system ("$limit_path/save_stat.pl >> $log_file 2>&1");
+sleep 1;
+system ("rm $stc_path/cur_tr.users >> $log_file 2>&1");
+system ("$squid_path/squid -k rotate >> $log_file 2>&1");
+system("chown $squid_user:$apache_group $access_log");
+sleep 1;
+system ("$limit_path/copy_log.pl >> $log_file 2>&1");
+
+
+my $m = (localtime)[4]+1;
+if ( -e "$access_log.m$m"){ unlink ("$access_log.m$m");}
+if($m<1){$m=12;}
+system ("cp $log_file $log_file.$m >> $log_file 2>&1");
+system (">$log_file >> $log_file 2>&1");

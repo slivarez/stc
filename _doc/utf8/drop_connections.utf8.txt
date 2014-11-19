@@ -1,0 +1,27 @@
+Разрыв соединений
+
+  Для работы разрыва соединений необходимо установить дополнительные модули.
+     libpcap		http://www.tcpdump.org/release/libpcap-0.8.3.tar.gz
+     NetPacket		http://search.cpan.org/CPAN/authors/id/A/AT/ATRAK/NetPacket-0.04.tar.gz
+     Net-Pcap		http://search.cpan.org/CPAN/authors/id/K/KC/KCARNUT/Net-Pcap-0.05.tar.gz
+     Net-PcapUtils	http://search.cpan.org/CPAN/authors/id/T/TI/TIMPOTTER/Net-PcapUtils-0.01.tar.gz
+     Net-RawIP		http://search.cpan.org/CPAN/authors/id/S/SK/SKOLYCHEV/Net-RawIP-0.1.tar.gz
+     hijack_sct		stc-2.0.1-beta/_modules/hijack_stc/
+  Также эти модели можно скачать с ftp.driver-vrn.ru/pub/stc.
+  После загрузки - распакуйте архивы tar -xvzf libpcap-0.8.3.tar.gz и выполните установку libpcap:
+    configure
+    make
+    make install
+  Для всех остальных tar -xvzf Net*
+    perl Makefile.PL
+    make
+    make test
+    make install
+  Не устанавливайте libpcap если у Вас она уже установлена. А проверить -
+  очень легко. Попробуйте установить какой-то модуль и посмотрите на вывод.
+
+  Для того, чтобы STC мог автоматически обрывать текущие сеансы закачки у 
+  "перебравших" или только что заблокированных пользователей, необходимо
+  установить патч extacclog на squid. При пропатченном сквиде и включенных
+  drop_connections в stc.conf никто сверх лимита много не накачает
+  (разве что самую малость до следующего запуска stat скрипта) ;-)

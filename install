@@ -1,0 +1,444 @@
+#!/usr/bin/perl
+#
+#created by Didenko A.V. e-Mail:didenych@ukr.net
+
+use Time::localtime;
+use File::Copy cp;
+use FileHandle;
+use Apache::Htpasswd;
+
+if (!-r "foretc/includes/ver.inc") { die "Can't open foretc/includes/ver.inc: line ".__LINE__."\n"; }
+require "foretc/includes/ver.inc";
+
+$Version="stc-$version";
+
+
+$tm = localtime;
+$m = $tm->mon + 1;
+$d = $tm->mday;
+$y = $tm->year + 1900;
+$h=$tm->hour;
+$mm=$tm->min;
+
+
+if (!-r "install.conf") {die "Can't open install.conf: line ".__LINE__."\n"; }
+
+print "\nRead install.conf file ... ";
+
+open cf, "<install.conf" or die "Can't open install.conf: $! : line ".__LINE__."\n";
+ while($line=<cf>){
+  chomp($line);
+  $line=~ s/#.*//;
+  $line=~ s/[\s\t]{1,}/ /;
+  $line=~ s/^[\s\t]{0,}//;
+  if (!$line)
+     {next;}
+  @parts=split(" ", $line);
+  $var=shift(@parts);
+  @$var=@parts;
+  $$var=$parts[0];
+  }
+close (cf);
+
+
+open UNAME, "uname|" or print "Error detect name system or no run uname: line ".__LINE__."\n";
+while (<UNAME>){ $UName=$_;}
+close (UNAME);
+chop($UName);
+
+if (( $site_ip eq "") or ($site_ip eq "auto")) 			{ $site_ip="127.0.0.1"; }
+if (( $stc_path eq "") or ($stc_path eq "auto")) 		{ $stc_path="/usr/local/stc/etc";}
+if (( $limit_path eq "") or ($limit_path eq "auto")) 		{ $limit_path="/usr/local/stc/limit";}
+if (( $SC_path eq "") or ($SC_path eq "auto")) 			{ $SC_path="/usr/local/stc/sarg";}
+if (( $squid_user eq "") or ($squid_user eq "auto")) 		{ $squid_user="squid";}
+if (( $squid_group eq "") or ($squid_group eq "auto")) 		{ $squid_group="squid";}
+if (( $log_install eq "") or ($log_install eq "auto")) 		{ $log_install="/var/log/error.log";}
+if (( $exclude_hosts eq "") or ($exclude_hosts eq "auto")) 	{ $exclude_hosts="$stc_path/exclude_hosts";}
+#start add 2.0.13
+if (( $sarg_exclude_codes_filelist eq "") or ($sarg_exclude_codes_filelist eq "auto")) 	
+    { 
+    if (-e "/etc/sarg/exclude_codes") {$exclude_hosts="$stc_path/sarg/exclude_codes";}
+    else {$exclude_hosts="$stc_path/sarg/exclude_codes";}
+    }
+#stop add 2.0.13
+
+if (( $language eq "") or ($language eq "auto"))	 	{ $language="rus-1251";}
+if (( $reports_dir eq "") or ($reports_dir eq "auto")) 		{ $reports_dir="/var/stc/reports";}
+
+if ( $UName ne "Linux"){
+    if (( $access_log eq "") or ($access_log eq "auto"))		{ $access_log="/usr/local/squid/logs/access.log";}
+    if (( $www_data_path eq "") or ($www_data_path eq "auto"))		{ $www_data_path="/usr/local/www/data"; }
+    if (( $apache_user eq "") or ($apache_user eq "auto")) 		{ $apache_user="www";}
+    if (( $apache_group eq "") or ($apache_group eq "auto"))		{ $apache_group="www";}
+    if (( $SGC_path eq "") or ($SGC_path eq "auto")) 			{ $SGC_path="/usr/local/etc/squid";}
+    if (( $squid_conf_path eq "") or ($squid_conf_path eq "auto")) 	{ $squid_conf_path="/usr/local/etc/squid";}
+    if (( $squid_path eq "")  or ($squid_path eq "auto"))		{ $squid_path="/usr/local/sbin";}
+    if (( $sarg_path eq "") or ($sarg_path eq "auto"))			{ $sarg_path="/usr/local/bin";}
+}
+else{
+    if (( $access_log eq "") or ($access_log eq "auto")) 		{ $access_log="/var/log/squid/access.log";}
+    if (( $www_data_path eq "") or ($www_data_path eq "auto")) 		{ $www_data_path="/var/www/html"; }
+    if (( $apache_user eq "") or ($apache_user eq "auto")) 		{ $apache_user="apache";}
+    if (( $apache_group eq "") or ($apache_group eq "auto")) 		{ $apache_group="apache";}
+    if (( $SGC_path eq "")  or ($SGC_path eq "auto"))			{ $SGC_path="/etc/squid";}
+    if (( $squid_conf_path eq "") or ($squid_conf_path eq "auto")) 	{ $squid_conf_path="/etc/squid";}
+    if (( $squid_path eq "") or ($squid_path eq "auto")) 		{ $squid_path="/usr/sbin";}
+    if (( $sarg_path eq "") or ($sarg_path eq "auto"))			{ $sarg_path="/usr/sbin";}
+}
+print "  done\n";
+
+
+print "Begin Intallation of $Version ...\n\n\n";
+print "Please check the following install options\n\n";
+
+print "-------------------------------------------------------------------\n";
+print "Your OS: \t\t\t\t\t$UName\n";
+print "Local ethernet device: \t\t\t\t$local_eth_device\n";
+print "Local net IP: \t\t\t\t\t$site_ip\n";
+print "Apache User: \t\t\t\t\t$apache_user\n";
+print "Apache Group: \t\t\t\t\t$apache_group\n";
+print "Squid User: \t\t\t\t\t$squid_user\n";
+print "Squid Group: \t\t\t\t\t$squid_group\n";
+print "-------------------------------------------------------------------\n";
+print "STC data files directory: \t\t\t$stc_path\n";
+print "STC limit scripts directory: \t\t\t$limit_path\n";
+print "File exclude hosts: \t\t\t\t$exclude_hosts\n";
+print "STC sarg files directory: \t\t\t$SC_path\n";
+print "Apache Document Root \t\t\t\t$www_data_path\n";
+print "Path sarg reports: \t\t\t\t$reports_dir\n";
+print "STC CGI-scripts directory: \t\t\t$www_data_path/stat\n";
+print "Squid Log File: \t\t\t\t$access_log\n";
+print "-------------------------------------------------------------------\n";
+print "SquidGuard Path Conf file:  \t\t\t$SGC_path\n";
+print "Squid Path Conf file: \t\t\t\t$squid_conf_path\n";
+print "Squid Path Bin file:  \t\t\t\t$squid_path\n";
+print "Sarg Path Bin file: \t\t\t\t$sarg_path\n";
+print "Charset codepage: \t\t\t\t$language\n";
+print "Install log file: \t\t\t\t$log_install\n";
+print "-------------------------------------------------------------------\n\n\n";
+
+print "If it's OK press Y, otherwise press N (Y/N) ";
+$answer=undef;
+while (!($answer =~ /[yYnN]/))
+{
+$answer=<STDIN>;
+}
+chomp $answer;
+if ($answer ne "Y" and $answer ne "y") { print "User break... \n"; sleep 1; exit; }
+print "Continue...\n";
+sleep 1;
+
+open slog, ">$log_install" or print "Can't create install log file:$! [line ".__LINE__."]";
+	printf slog "\nInstallation of $Version on $d.$m.$y at $h:$mm [begin]\n";
+	print slog "Your OS: \t\t\t\t$UName\n";
+	print slog "Apache User: \t\t\t\t$apache_user\n";
+	print slog "Apache Group: \t\t\t\t$apache_group\n";
+	print slog "Squid User: \t\t\t\t$squid_user\n";
+	print slog "Squid Group: \t\t\t\t$squid_group\n";
+	print slog "Local net IP: \t\t\t\t$site_ip\n";
+	print slog "STC data files directory: \t\t\t$stc_path\n";
+	print slog "STC limit scripts directory: \t\t\t$limit_path\n";
+	print slog "STC sarg files directory: \t\t\t$SC_path\n";
+	print slog "Apache Document Root \t\t\t\t$www_data_path\n";
+	print slog "STC CGI-scripts directory: \t\t\t$www_data_path/stat\n";
+	print slog "Squid Log File: \t\t\t\t$access_log\n";
+	print slog "SquidGuard Path Conf file:  \t\t\t$SGC_path\n";
+	print slog "Squid Path Conf file: \t\t\t\t$squid_conf_path\n";
+	print slog "Squid Path Bin file:  \t\t\t\t$squid_path\n";
+	print slog "Sarg Path Bin file: \t\t\t\t$sarg_path\n";
+	print slog "Install log file: \t\t\t\t$log_install\n\n\n";
+close (slog);
+
+
+print "Creating directories...\t\t\t\t";
+system("echo Creating directories... >> $log_install");
+system("mkdir -p $stc_path >> $log_install 2>&1");
+system("mkdir -p $limit_path >> $log_install 2>&1");
+system("mkdir -p $SC_path >> $log_install 2>&1");
+system("mkdir -p $www_data_path/stat >> $log_install 2>&1");
+system("mkdir $www_data_path/stat/statist >> $log_install 2>&1");
+system("mkdir $www_data_path/stat/messages >> $log_install 2>&1");
+system("mkdir $www_data_path/stat/images >> $log_install 2>&1");
+system("mkdir $www_data_path/stat/themes >> $log_install 2>&1");
+system("mkdir -p $stc_path/messages/users >> $log_install 2>&1");
+system("mkdir -p $reports_dir >> $log_install 2>&1");
+system("mkdir $stc_path/dpools >> $log_install 2>&1");
+
+
+print "done\n";
+system("echo done>> $log_install");
+print "Copying files...\t\t\t\t\n";
+system("echo Copying files... >> $log_install");
+
+system("cp uninstall $stc_path/ >> $log_install 2>&1");
+system("cp squid/limit/* $limit_path/ >> $log_install 2>&1");
+system("cp sarg/* $SC_path >> $log_install 2>&1");
+system("cp -r apache/stat/* $www_data_path/stat/ >> $log_install 2>&1");
+system("cp -R apache/themes $www_data_path/stat/ >> $log_install 2>&1");
+system("cp apache/statist/* $www_data_path/stat/statist >> $log_install 2>&1");
+system("cp apache/messages/* $www_data_path/stat/messages >> $log_install 2>&1");
+
+print "Your squid.conf copy to squid.conf.old.stc\n";
+system("echo Your squid.conf copy to squid.conf.old.stc >> $log_install");
+system("cp $squid_conf_path/squid.conf $squid_conf_path/squid.conf.old.stc >> $log_install 2>&1");
+
+print "Your squidGuard.conf renamed to squidGuard.conf.old.stc\n";
+system("echo Your squidGuard.conf renamed to squidGuard.conf.old.stc >> $log_install");
+system("mv $SGC_path/squidGuard.conf $SGC_path/squidGuard.conf.old.stc >> $log_install 2>&1");
+system("cp foretc/squidGuard.conf.allow $SGC_path/squidGuard.conf >> $log_install 2>&1");
+
+system("touch $stc_path/users.log >> $log_install 2>&1");
+
+print "STC config file is /etc/stc.conf\n";
+system("echo STC config file is /etc/stc.conf >> $log_install");
+system("cp ./install.conf /etc/stc.conf >> $log_install 2>&1");
+
+system("cp -R foretc/* $stc_path >> $log_install 2>&1");
+
+print "Copying done\n";
+system("echo done>> $log_install");
+
+
+print "Changing file attributes...\t\t\t";
+system("echo Changing file attributes... >> $log_install");
+
+#system("chown $apache_user $SGC_path/squidGuard.conf >> $log_install 2>&1");
+system("chown $apache_user $stc_path/*.users >> $log_install 2>&1");
+system("chown $apache_user $stc_path/cur_tr.otdel >> $log_install 2>&1");
+system("chown $apache_user $stc_path/users.log >> $log_install 2>&1");
+system("chown -R $apache_user $stc_path/profiles >> $log_install 2>&1");
+system("chmod -R 755 $stc_path/profiles>> $log_install 2>&1");
+system("chown $apache_user $reports_dir >> $log_install 2>&1");
+system("chmod 755 $reports_dir>> $log_install 2>&1");
+system("chown root $stc_path/trusted_users >> $log_install 2>&1");
+system("chown root $stc_path/boss.users >> $log_install 2>&1");
+system("chown root $stc_path/admin.users >> $log_install 2>&1");
+system("chown $apache_user $stc_path/dpools >> $log_install 2>&1");
+system("chmod 755 $stc_path/dpools >> $log_install 2>&1");
+
+system("chown -R $apache_user:$apache_group $www_data_path/stat/* >> $log_install 2>&1");
+system("chmod 644 $www_data_path/stat/*  >> $log_install 2>&1");
+
+system("chown $apache_user:$apache_group $www_data_path/stat/statist/* >> $log_install 2>&1");
+system("chmod -R 750 $www_data_path/stat/statist/  >> $log_install 2>&1");
+system("chmod -R 750 $www_data_path/stat/messages/  >> $log_install 2>&1");
+system("chmod -R 755 $www_data_path/stat/themes/  >> $log_install 2>&1");
+
+#system("chown root:$apache_group $www_data_path/stat/statist/init_stc.pl >> $log_install 2>&1");
+#system("chmod 440 $www_data_path/stat/statist/init_stc.pl");
+
+system("chown $apache_user:$apache_group $stc_path/messages/users >> $log_install 2>&1");
+system("chown $apache_user:$apache_group $stc_path >> $log_install 2>&1");
+
+system("chown 0:0 $limit_path/* >> $log_install 2>&1");
+system("chmod 750 $limit_path/*");
+
+print "done\n";
+system("echo done>> $log_install");
+
+open ff2, ">$stc_path/blocked.users" or print "Can't create $stc_path/blocked.users";
+printf ff2 "loooser\n";
+close (ff2);
+system("chown $apache_user:$apache_group $stc_path/blocked.users >> $log_install 2>&1");
+system("chmod 644 $stc_path/blocked.users");
+
+print "Your /etc/crontab copy to /etc/crontab.old.stc\n";
+system("echo Your /etc/crontab copy to /etc/crontab.old.stc >> $log_install");
+system("cp /etc/crontab /etc/crontab.old.stc >> $log_install 2>&1");
+
+print "Updating /etc/crontab...\t\t\t";
+system("echo Updating /etc/crontab... >> $log_install");
+
+$fil="/etc/crontab";
+open file1, ">>$fil" or die "Can't open $fil line:".__LINE__."\n";
+ printf file1 "#\n";
+ printf file1 "# Squid Traffic Counter $Version [begin]\n";
+ printf file1 "#\n";
+ printf file1 "*/2	*	*	*	*	root	nice -n -19 $limit_path/stat\n";
+ printf file1 "0,30	*	*	*	*	root	nice -n -19 $limit_path/squid_rotate\n";
+ printf file1 "0	0	1	*	*	root	nice -n -19 $limit_path/monthly_rotate\n";
+ printf file1 "01	0	*	*	*	root	nice -n -19 $SC_path/run\n";
+ printf file1 "# Squid Traffic Counter $Version [end]\n";
+ printf file1 "#\n";
+
+close (file1);
+print "done\n";
+system("echo done>> $log_install");
+
+print "Creating user dummy (password:dummypass)...\t";
+system("echo Creating user dummy>> $log_install");
+
+system("touch $stc_path/password >>$log_install 2>&1");
+$pass_path="$stc_path/password";
+$ap_htpass=new Apache::Htpasswd($pass_path);
+$ap_htpass->htpasswd("dummy", "dummypass");
+
+system("chown $apache_user:$squid_group $stc_path/password >> $log_install 2>&1");
+system("chmod 640 $stc_path/password >> $log_install 2>&1");
+
+print "done\n";
+system("echo done>> $log_install");
+
+print "Creating $stc_path/local.domains...\t";
+system("echo Creating $stc_path/local.domains...>> $log_install");
+open loc_url, ">$stc_path/local.domains";
+	printf loc_url "$site_ip\n";
+close (loc_url);
+print "done\n";
+system("echo done>> $log_install");
+
+system("chown $squid_user:$squid_group $stc_path/local.domains >> $log_install 2>&1");
+
+
+
+sub parse_file($$)
+{
+    my $file_name = $_[0];
+    my $mode = $_[1];
+    my @thisarray;
+    my @tmp;
+    my $k;
+    open(LR,"$file_name") or print "Can't open $file_name: $!\n";
+    flock(LR,1) or print "Can't flock $file_name: $!\n";
+    @thisarray = <LR>;
+    close(LR) or print "Can't close $file_name: $!\n";
+
+    foreach (@thisarray) 
+    {
+	if ($mode eq 'parse')
+	{
+    	    @tmp = split('@');
+    	    $k=@tmp;
+    	    for ($i=0; $i<=$k; ++$i){
+        	if ($tmp[$i] eq "stc_path") 	{	$tmp[$i] = "$stc_path";      $_ = join('', @tmp);    }
+        	if ($tmp[$i] eq "site_ip")  	{	$tmp[$i] = "$site_ip";       $_ = join('', @tmp);    }
+		if ($tmp[$i] eq "www_data_path"){	$tmp[$i] = "$www_data_path"; $_ = join('', @tmp);    }
+		if ($tmp[$i] eq "exclude_hosts"){	$tmp[$i] = "$stc_path/exclude_hosts"; $_ = join('', @tmp); }
+    	    }#for
+	}
+	elsif ($mode eq 'replace')
+	{
+            @tmp = split(' ');
+	    $k=@tmp;
+	    if ($tmp[0] eq "site_ip") 		{	$tmp[1] = "$site_ip";	    	    }
+	    if ($tmp[0] eq "stc_path") 		{	$tmp[1] = "$stc_path";	    	    }
+	    if ($tmp[0] eq "limit_path") 	{	$tmp[1] = "$limit_path";	    }
+	    if ($tmp[0] eq "SC_path") 		{	$tmp[1] = "$SC_path";	    	    }
+	    if ($tmp[0] eq "squid_user") 	{	$tmp[1] = "$squid_user";	    }
+	    if ($tmp[0] eq "squid_group") 	{	$tmp[1] = "$squid_group";	    }
+            if ($tmp[0] eq "log_install") 	{ 	$tmp[0] = ""; $tmp[1] = "";         }
+	    if ($tmp[0] eq "exclude_hosts")	{	$tmp[1] = "$stc_path/exclude_hosts";}
+#start add 2.0.13
+	    if ($tmp[0] eq "sarg_exclude_codes_filelist"){$tmp[1] = "$sarg_exclude_codes_filelist";}
+#stop add 2.0.13
+            if ($tmp[0] eq "enable_suid") 	{ 	$tmp[0] = ""; $tmp[1] = "";         }
+            if ($tmp[0] eq "language") 		{       $tmp[1] = "$language";              }
+            if ($tmp[0] eq "reports_dir") 	{       $tmp[1] = "$reports_dir";           }
+	    if ($tmp[0] eq "access_log") 	{	$tmp[1] = "$access_log";	    }
+	    if ($tmp[0] eq "www_data_path") 	{	$tmp[1] = "$www_data_path";	    }
+	    if ($tmp[0] eq "apache_user") 	{	$tmp[1] = "$apache_user";	    }
+	    if ($tmp[0] eq "apache_group") 	{	$tmp[1] = "$apache_group";	    }
+	    if ($tmp[0] eq "SGC_path") 		{	$tmp[1] = "$SGC_path";	    	    }
+	    if ($tmp[0] eq "squid_conf_path")	{	$tmp[1] = "$squid_conf_path";	    }
+ 	    if ($tmp[0] eq "squid_path") 	{	$tmp[1] = "$squid_path";	    }
+	    if ($tmp[0] eq "sarg_path") 	{	$tmp[1] = "$sarg_path";	    	    }
+            if ($tmp[0] eq "report_generator")	{       $tmp[1] = "$report_generator";      }
+
+	    if ($tmp[0] eq "drop_connections") 	{	$tmp[1] = "$drop_connections";	    	    }
+	    if ($tmp[0] eq "skip_cache") 	{	$tmp[1] = "$skip_cache";	    	    }
+
+	    $tmp[$k]=$tmp[$k]."\n";
+            $_ = join(' ', @tmp);
+	}
+    }#foreach thisarray
+    open(LR,"> $file_name") or print "Can't open $file_name: $!\n";
+    flock(LR,1) or print "Can't flock $file_name: $!\n";
+    print LR @thisarray;
+    close(LR) or print "Can't close $file_name: $!\n";
+}
+
+print "Updating /etc/stc.conf...\t\t\t";
+system("echo Updating /etc/stc.conf...>> $log_install");
+    parse_file("/etc/stc.conf", "replace");
+print "done\n";
+system("echo done>> $log_install");
+
+
+
+print "Updating $SGC_path/squidGuard conf..."; 
+system("echo Updating $SGC_path/squidGuard conf...>> $log_install");
+    parse_file("$SGC_path/squidGuard.conf", "parse");
+    parse_file("$stc_path/squidGuard.conf.allow", "parse");
+    parse_file("$stc_path/squidGuard.conf.profil", "parse");
+print "done\n";
+system("echo done>> $log_install");
+
+print "Updating $SC_path/shablon.conf...\t";
+system("echo Updating $SC_path/shablon.conf...>> $log_install");
+    parse_file("$SC_path/shablon.conf", "parse");
+print "done\n";
+system("echo done>> $log_install");
+
+# squid rotate
+print "Squid rotate ...\t\t\t\t";
+system("echo Squid rotate ...>> $log_install");
+system("$squid_path/squid -k rotate >> $log_install 2>&1");
+sleep 1;
+print "done\n";
+system("echo done>> $log_install");
+print "Squid reconfigure ...\t\t\t\t";
+system("echo Squid reconfigure ...>> $log_install");
+system("$squid_path/squid -k reconfigure >> $log_install 2>&1");
+sleep 1;
+print "done\n";
+system("echo done>> $log_install");
+
+print "Updating $squid_conf_path/squid.conf...\t\t\t";
+system("echo Updating $squid_conf_path/squid.conf...>> $log_install");
+
+        my $logfile="$squid_conf_path/squid.conf";
+	if (!-r "$logfile") {die "Can't open read $logfile: line ".__LINE__."\n";}
+        my @thisarray;
+        open(LR,"$logfile") or print "Can't open $logfile: $!\n";
+        flock(LR,1) or print "Can't flock $logfile: $!\n";
+        @thisarray = <LR>;
+        close(LR) or print "Can't close $logfile: $!\n";
+
+        my @tmp;
+        foreach (@thisarray)
+        {
+          $_ =~ s/([\"\\])/\\$1/g;
+          eval('$_="'."$_".'";');
+        }
+
+        open(LR,"> $logfile") or print "Can't open $logfile: $!\n";
+        flock(LR,1) or print "Can't flock $logfile: $!\n";
+        print LR @thisarray;
+
+        close(LR) or print "Can't close $logfile: $!\n";
+print "done\n";
+system("echo done>> $log_install");
+
+
+system ("$SC_path/run");
+
+if (!-w "$log_install") {die "Can't open write $log_install: line ".__LINE__."\n";}
+open slog, ">>$log_install";
+printf slog "Installation of $Version at $d.$m.$y [end]\n";
+close (slog);
+
+print "Check/edit your config files:\n";
+print "  /etc/stc.conf\n";
+print "  $SC_path/sarg.conf\n";
+print "  $SC_path/shablon.conf\n";
+print "  $squid_conf_path/squid.conf\n";
+print "  $SGC_path/squidGuard.conf - this is new config made by STC\n";
+print "  Your old squidGuard.conf is $SGC_path/squidGuard.conf.old.stc\n";
+print "  $stc_path/squidGuard.conf.allow\n";
+print "  $stc_path/squidGuard.conf.profile\n";
+print "  /..../httpd.conf\n\n";
+print "Installation complete!\n\n";
+sleep 2;
+exit 0;
+
+

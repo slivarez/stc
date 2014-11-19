@@ -1,0 +1,105 @@
+#!/usr/bin/perl
+#
+#created by Didenko A.V. e-Mail:didenych@ukr.net
+
+use Time::localtime;
+use File::Copy cp;
+use FileHandle;
+
+print "\nBegin Unintallation of STC-2.x ...\n";
+
+$tm = localtime;
+$m = $tm->mon + 1;
+$d = $tm->mday;
+$y = $tm->year + 1900;
+$h=$tm->hour;
+$mm=$tm->min;
+
+print "\n\nRun UNINSTALL STC  - press Y, or N (Y/N) ";
+$answer=undef;
+while (!($answer =~ /[yYnN]/))
+{
+$answer=<STDIN>;
+}
+chomp $answer;
+if ($answer ne "Y" and $answer ne "y") { print "User break... \n"; sleep 1; exit; }
+print "Continue uninstall...\n\n";
+sleep 1;
+
+print "Reading /etc/stc.conf ...";
+open cf, "</etc/stc.conf" or die "No install STC. Can't open /etc/stc.conf: $!\n";
+while(<cf>){
+    @F=split(' ');
+    if ($F[0] eq '#'){next;}
+    if ($F[0] eq 'site_ip'){
+	$site_ip=$F[1];
+    }
+    if ($F[0] eq 'stc_path'){
+	$stc_path=$F[1];
+    }
+    if ($F[0] eq 'limit_path'){
+	$limit_path=$F[1];
+    }
+    if ($F[0] eq 'www_data_path'){
+	$www_data_path=$F[1];
+    }    
+    if ($F[0] eq 'SGC_path'){
+	$SGC_path=$F[1];
+    }
+    if ($F[0] eq 'SC_path'){
+	$SC_path=$F[1];
+    }
+    if ($F[0] eq 'squid_path'){
+	$squid_path=$F[1];
+    }
+    if ($F[0] eq 'squid_conf_path'){
+	$squid_conf_path=$F[1];
+    }
+}
+close (cf);
+print "done\n";
+
+
+
+open slog, ">>/var/log/error.log";
+printf slog "\nUninstallation stc-2.x on $d.$m.$y at $h:$mm [begin]\n";
+close (slog);
+
+print "STC data files directory: $stc_path\n";
+print "STC limit scripts directory: $limit_path\n";
+print "STC sarg config files directory: $SC_path\n";
+print "STC CGI-scripts directory: $www_data_path/stat\n";
+
+
+print"Deleting directories...";
+system("rm -R $stc_path/includes >> /var/log/error.log 2>&1");
+system("rm -R $stc_path/lang >> /var/log/error.log 2>&1");
+system("rm -R $stc_path/messages >> /var/log/error.log 2>&1");
+if ($limit_path and ($limit_path ne '/')){system("rm -R $limit_path >> /var/log/error.log 2>&1");}
+if ($SC_path and ($SC_path ne '/')){system("rm -R $SC_path >> /var/log/error.log 2>&1");}
+system("rm -R $www_data_path/stat >> /var/log/error.log 2>&1");
+
+
+print "done\n";
+
+print "Your $squid_conf_path/squid.conf.old.stc renamed back to $squid_conf_path/squid.conf\n";
+system("mv $squid_conf_path/squid.conf.old.stc $squid_conf_path/squid.conf >> /var/log/error.log 2>&1");
+
+print "Your /etc/crontab.old.stc renamed back to /etc/crontab\n";
+system("mv /etc/crontab.old.stc /etc/crontab >> /var/log/error.log 2>&1");
+
+print "Deleting STC config file /etc/stc.conf ...";
+system("rm /etc/stc.conf >> /var/log/error.log 2>&1");
+print "done\n";
+
+#system("/usr/local/sbin/squid -k rotate >> /var/log/error.log 2>&1");
+system("$squid_path/squid -k reconfigure >> /var/log/error.log 2>&1");
+
+print "remove everything between STC-2.x [begin] and STC-2.x [end]\n\n";
+open slog, ">>/var/log/error.log";
+printf slog "Uninstallation stc-2.x on $d.$m.$y [end]\n";
+close (slog);
+
+print "Uninstallation compleat!\n\n";
+sleep 2;
+exit;

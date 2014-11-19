@@ -1,0 +1,156 @@
+Squid Traffic Counter installation
+
+
+1. System requirements
+
+Before STC installation please make sure you have the following software installed on your server:
+
+1.      squid-2.4.STABLE1 or higher, with auth enabled
+2.      squidGuard
+3.      Apache (suexec)
+4.      sarg-1.4.1 or sarg-2.*
+5.      libpcap
+6.      Perl modules:
+          Apache-Htpasswd-1.5.5 or higher
+          NetPacket
+          NetPacket
+          Net-PcapUtils
+          Net-RawIP
+          Hijack_stc (it's in stc-2.*/_modules/hijack_stc/)
+
+
+2. STC configuration
+
+Edit STC install.conf (stc-*.*.*/install.conf). Please doublecheck TAGs that contains path to your squid binary or path to squidGuard.conf etc.
+
+3. Services configuration
+
+3.1. Squid configuration
+
+the following lines should be in your squid.conf file:
+
+##############BEGIN##################
+logfile_rotate 5
+emulate_httpd_log off
+
+auth_param basic program /usr/local/libexec/ncsa_auth <stc_path>/password #replace <stc_path> with it's value from STC install.conf
+auth_param basic children 5
+auth_param basic realm Squid Traffic Counter
+auth_param basic credentialsttl 2 hours
+
+redirect_program /usr/local/bin/squidGuard #replace with your path to squidGuard bin
+redirect_children 5
+redirector_bypass on
+
+acl trusted_users src "<stc_path>/trusted_users" #replace <stc_path> with it's value from STC install.conf
+acl all_users proxy_auth REQUIRED
+
+http_access allow trusted_users
+http_access allow all_users
+http_access deny all
+################END##################
+
+3.2. SquidGuard configuration
+
+STC install script will automatically create config files for squidGuard. After STC installation there will be 2 basic squidGuard config files in <stc_path> directory: squidGuard.allow and squidGuard.profil
+
+squidGuard.allow - config for squidGuard when global internet access is enabled
+squidGuard.profil - config for squidGuard when global internet access is disabled
+
+If you would like to add some custom rules to squidGuard (like blocking porn for your users etc) please edit those files but not actual squidGuard.conf file. After you finished editing those files just click on STC_WEB_interface->AdminPage->Unblock Internet.
+
+3.3. Apache configuration
+
+!NOTE! replace <www_data_path> and <stc_path> with their values from STC install.conf
+Please use VirtualHost configiguration (3.3.1) instead of Old style config (3.3.2)
+
+3.3.1 VirtualHost config (RECOMENDED, better security)
+
+Please note:
+1) Apache should be compiled with suexec support (example: ./configure --enable-suexec --suexec-logfile=/var/log/suexec_log --suexec-userdir=public_html)
+2) Before STC install you should create user 'stc' and group 'stc' (without quotes) on your server
+3) Make sure that /home/stc/public_html directory exists (if not - create it)
+4) Update www_data_path, apache_user and apache_group TAGs in STC install.conf to the following:
+www_data_path /home/stc/public_html
+apache_user stc
+apache_group stc
+
+##############BEGIN##################
+<VirtualHost 172.16.0.39> #put your IP here
+    ServerAdmin root@localhost
+    Options Indexes FollowSymlinks MultiViews
+    DocumentRoot /home/stc/public_html
+    ServerName stc_gate.com #Put your virtual hostname here
+    ErrorLog logs/gate-x_error_log
+    CustomLog logs/gate-x_access_log common
+    User stc # NOTE: for apache2 please use: SuexecUserGroup stc stc
+    Group stc # NOTE: for apache2 not needed, only one line with SuexecUserGroup required
+    AccessFileName .htaccess
+    ScriptAlias /stat/cgi/ /home/stc/public_html/stat/statist/
+    ScriptAlias /~stc/stat/cgi/ /home/stc/public_html/stat/statist/
+    <Directory /home/stc/public_html/stat>
+        Options Indexes FollowSymlinks MultiViews
+        AllowOverride All
+        Order allow,deny
+        Allow from all
+    </Directory>
+    <Directory /home/stc/public_html/stat/statist>
+        AddHandler cgi-script .cgi .pl
+        Options +ExecCGI
+        AuthType Basic
+        AuthName "STC WEB-server"
+        AuthUserFile /usr/local/stc/etc/password
+        Require valid-user
+        Order allow,deny
+        Allow from all
+    </Directory>
+    <Directory /home/stc/public_html/stat/messages>
+        AddHandler cgi-script .cgi .pl
+        Options +ExecCGI
+        Order allow,deny
+        Allow from all
+    </Directory>
+</VirtualHost>
+################END##################
+
+3.3.2 Old style apache config
+Reminder: please use VirtualHost style config instead - 3.3.1 :-)
+
+add the following lines to your httpd.conf file:
+
+##############BEGIN##################
+<Directory "<www_data_path>/stat"> 
+Options Indexes FollowSymLinks MultiViews 
+AllowOverride All 
+Order allow,deny 
+Allow from all 
+</Directory>
+
+ScriptAlias /stat/cgi/ "<www_data_path>/stat/statist/"
+<Directory "<www_data_path>/stat/statist">
+AllowOverride None
+Options ExecCGI 
+AuthType Basic
+AuthName "STC Interface"
+AuthUserFile <stc_path>/password
+Require valid-user
+Order allow,deny
+Allow from all
+</Directory>
+
+ScriptAlias /stat/messages/ "<www_data_path>/stat/messages/"
+<Directory "<www_data_path>/stat/messages">
+AllowOverride None
+Options ExecCGI
+Order allow,deny
+Allow from all
+</Directory>
+################END##################
+
+4. STC installation
+
+1) Run STC install script (stc-*.*.*/install)
+2) Reconfigure squid (squid -k reconfigure)
+3) Restart apache  ("apachectl restart" for apache1 or "httpd -k restart" for apache2)
+4) Check /etc/crontab - there should be lines from STC installation, reload your crond service
+

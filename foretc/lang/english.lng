@@ -1,0 +1,338 @@
+600:utf8
+1:Can't open ADMIN file
+2:Can't open
+3:Can't flock
+4:Can't close
+5:Access Denied. Goodbye.
+6:Go back
+7:ERROR!
+8:Invalid user name.
+9:Invalid unit!
+10:Hacking attempt!
+11:Adding new user
+12:User
+13:Lastname
+14:Name
+15:Surname
+16:Group
+17:Limit (Mb)
+18:No Limit for this User
+19:New password
+20:Re-type password
+21:User
+22:created
+23:User with nickname
+24:already exist!
+25:ERROR! Mismatch in new passwords.
+26:Accept
+27:Reset
+28:Add new user
+29:Change password for user
+30:Change limit for user
+31:Full statistic
+32:Month
+33:Traffic for
+34:Name
+35:Traffic
+36:TOTAL TRAFFIC
+37:Total
+38:Internet will be blocked in few minutes
+39:Change password for user
+40:Old password
+41:Users
+42:Common traffic
+43:Password changed.
+44:ERROR. Password unchanged.
+45:Invalid old password.
+46:ERROR! Mismatch in new passwords.
+47:Yes
+48:No
+49:removed!
+50:Go to statistic
+51:Delay pools control
+52:Go to delay pools control
+53:Back
+54:Welcome to delay pools configuration
+55:            Check messages           
+56:Send message from Administrator
+57:        Send mass-messages       
+58: Check messages for  
+59:Administrator messages
+60:From
+61:New
+62:Date
+63:Subject
+64:Reply
+65:Remove
+66:Prev Page
+67:Next Page
+68:Messages is not allowed!
+69:Send  message
+70:User <b>Administrator</b> - is your system administrator
+71:Select destination groups for this message
+72:group #
+73:Send message to all users
+74:Send from <b>Administrator</b>
+75:Message
+76:Send
+77:Reset
+78:There is no user 
+79:Send messages is not allowed!
+80:Message sent,
+81:             Send  message            
+82:Time
+83:traffic
+84:UNLIMIT USER!
+85:Quota contol is denied for unit
+86:Change traffic limit for
+87:Reserve for group
+88:Status
+89:Traffic left for
+90:Add (Mb)
+91:Accept
+92:New values
+93:Group reserve
+94:Mb
+95:Traffic left for
+96:No user
+97:in group
+98:<b>ERROR!</b> Verify input values.
+99:Information about
+100:Nickname
+101:No Limit
+102:bytes
+103:Limit
+104:Save
+105:     Change  limit    
+106:Set new password
+107:     Full   statistic    
+108: Send  a  message
+109:Remove user
+110:Full user statistic for
+111:Welcome
+112:Daily reports
+113:Weekly reports
+114:Monthly reports
+115:user + IP statistic
+116:Report created
+117:Site
+118:Last time
+119:Current traffic
+120:Monthly limit
+121:Traffic left
+122:Block Internet
+123:Unblock Internet
+124:<u>Administrator page</u>
+125:View statistic for all users
+126:Vew full statistic for user
+127:New messages!
+128:Messages
+129:Statistic
+130:Report
+131:(daily)
+132:(weekly)
+133:(monthly)
+134:Full name
+135:UNBLOCK
+136:BLOCK
+137:Allowed
+138:Denied
+139:BLOCKED
+140:Gropu reserve
+141:Add traffic
+142:Add
+143:Internet will be unblocked in few minutes
+144:Change limit for user
+145:bytes
+146:Current limit for
+147:Set new limit
+148:Set
+149:Add traffic
+150:Add (Mb)
+151:Add
+152:Domain
+153:Interface
+154:e-Mail
+155:User is blocked
+156:User is unblocked
+401:Jan
+402:Feb
+403:Mar
+404:Apr
+405:May
+406:Jun
+407:Jul
+408:Aug
+409:Sep
+410:Oct
+411:Nov
+412:Dec
+500:Contact your system administrator
+501:No such unit registred in STC.
+502:Can't check new user!
+503:Can't check
+504:Can't change traffic for this user.
+505:Access Denied!
+506:You are BLOCKED!
+507:This source is not allowed
+508:Traffic limit achieved
+509:Try again next month.
+510:Can't create user profile
+2000:Bandwidth controll
+2001:ERROR
+2002:Proxy server is build without support of bandwidth controll
+2003:Rebuild your proxy-server with <b>--enable-delay-pools</b> option
+2004:you need to specify general parameters
+2005:you need to specify personal parameters
+2006:you need to specify users
+2007:cannot open
+2008:cannot open folder
+2009:Personal
+2010:Departmental
+2011:Class
+2012:Users
+2013:Department 
+2014:Limitations
+2015:General
+2016:Speed
+2017:Size
+2018:bytes/sec
+2019:bytes
+2020:Personal
+2021:Number
+2022:Refresh
+2023:Delete
+2024:To the end
+2025:Before 
+2026:Add
+2027:You have no rights to limit bandwidth to selected users
+2028:You have no rights to delete selected rule
+2029:Cannoc connecto to server on 
+2030:Active requests
+2031:Cannot get data from server
+2032:IP address
+2033:URL
+2034:Active time, hh:mm:ss
+2035:Clients
+2036:Number of connections
+2037:Server information
+2038:Working time
+2039:CPU load
+2040:CPU load 5 min
+2041:CPU load 60 min
+2042:Unable to add connection termination job now
+2043:Queue file is blocked. Try again later
+2044:Connection termination job with
+2045:added succesfully
+2046:Connection will be terminated in a fue minutes
+2047:Error writing in queue file
+2048:Connection termination job cannot be added
+2049:No rights for writing in queue file or stc dir
+2050:You have no rights to terminate connections
+2051:Error opening 
+2052:squid.conf file
+2053:Terminate all connections
+2054:Main page
+2055:Information
+2056:Statistics
+2057:Reports
+2058:Change password
+2059:Выход
+
+menu_index:Main Page
+menu_info:Information
+menu_stat:Statistics
+menu_reports:Reports
+menu_chpasswd:Profile
+
+menu_users:Users
+menu_otdels:Units
+menu_bosses:Managers
+menu_dpools:Bandwidth
+menu_serverstat:Server Status
+menu_adminpage:Admin Page
+
+page_index:Main PAge
+page_info:Information
+page_adduser:Adding new user
+page_user:Users
+page_change_pass:Password Change
+page_users:List of users
+
+error:ERROR!
+cannot_open:Can't open
+cannot_open_folder:Can't open directory
+access_denied:Access Denied!
+otdel_file:unit file!
+write:write
+read:read
+error_add_user:Error adding user
+#error_add_user:Error changing info
+msg_domain:MUST be empty unless your using NTLM squid authentification
+login:login
+limit:limit
+modify:modify
+delete:delete
+submit_delete:Are you sure you want to delete user
+no_such_user:No such user
+user:user
+was_deleted:was removed
+user_info:user info
+changed:changed
+to_user_list:To user list
+otdel_traffic:Traffic for unit
+total:TOTAL
+pass_mismatch:Password mismatch
+total_sent:Total sent
+messages:messages
+ulimit_control:User limit control
+cur_boss_info:Information about Manager
+boss_list: List of Managers
+view_stat: View Stat
+view_reports: View Reports
+add_users: Add Users
+del_users: Del Users
+manage_traffic: Manage Traffic
+manage_reserv: Manage Reserve
+give_all: Give All
+submit: Submit
+no_profile_makedef: Can't open user's profie, making default
+back:Back
+grant_otdel:Grant unit
+grant_button:Grant it
+empty_otdel: all units granted
+mailto: send eMail
+enable: Enable
+disable: Disable
+res_blocked: Disabled
+otd_name: unit name
+reserve: Reserve
+otd_res_action: Action with Reserve
+submit_ores_disable: You will lose current reserve for this unit. Continue?
+create_otdel: Create new unit
+add_otdel: create unit
+otdel_num: unit number
+otdel_name: unit name
+otdel:unit
+otdels:units
+submit_otdel_delete: You are about to remove this unit with all users under it. Continue?
+nolimit:Unlimited
+mess_to:To
+action:Action
+change_perms:Change permissions
+empty_passwd:Empty password
+iface_change:Interface change
+change_pw:Change password
+profile_info:Information
+reports_na: Reports not available
+dpools_header:Please do not forget to reconfigure squid after you finish DelayPolls config
+squid_reconf:Squid reconfigure
+squid_reconf_queued:<b>squid reconfigure</b> queued
+permissions:Permissions
+not_exist:not exist!
+logout:Logout
+logout_msg:Are you sure you want to logout?
+logout_confirm:Yes, I'm sure!
+dear_users:Dear users!
+profil:Internet is not available at the moment. Thank you for you patience and understanding.
+unknown_user:Unknown user!

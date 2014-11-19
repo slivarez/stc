@@ -1,0 +1,54 @@
+#!/usr/bin/perl
+#Copyright (C) 2003  Didenko A.V.
+#created by Didenko A.V. e-Mail:slivarez@list.ru
+
+open cf, "</etc/stc.conf" or die "$!";
+while($line=<cf>){
+    chomp($line);
+    $line=~ s/#.*//;
+    $line=~ s/[\s\t]{1,}/ /;
+    $line=~ s/^[\s\t]{0,}//;
+    if (!$line){next;}
+    @parts=split(" ", $line);
+    $var=shift(@parts);
+    @$var=@parts;
+    $$var=$parts[0];
+}
+close (cf);
+
+# To fix the problem when squid -k reconfigure and squid -k rotate are being run at the same time from diff scripts
+sleep 20;
+
+system ("$limit_path/userstat.pl >> $log_file 2>&1");
+sleep 1;
+system ("$limit_path/allowusers.pl >> $log_file 2>&1");
+sleep 1;
+
+my $squid_output = undef;
+
+if ($service_to_reconf eq 'squidGuard'){
+    system ("killall -1 squidGuard >> $log_file 2>&1");
+}
+else {
+    system ("$squid_path/squid -k reconfigure >> $log_file 2>&1");
+    if ( -e "$stc_path/squid_reconf.lock"){
+	unlink ("$stc_path/squid_reconf.lock");
+    }
+}
+
+#Drop connections for DENY and BLOCK users
+if ($drop_connections eq "yes"){
+    system ("$limit_path/drop_conn.pl >> $log_file 2>&1");
+}
+
+#Checking and fixing permissions
+system ("$limit_path/perm_fixer.pl >> $log_file 2>&1");
+    
+#Reseting connections marked by serverstat.cgi
+system ("$limit_path/reset_queue.pl >> $log_file 2>&1");
+
+#If squid_reconf.lock still exists, then we should run squid reconf
+if ( -e "$stc_path/squid_reconf.lock"){
+    system ("$squid_path/squid -k reconfigure >> $log_file 2>&1");
+    unlink ("$stc_path/squid_reconf.lock");
+}

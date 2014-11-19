@@ -1,0 +1,25 @@
+#!/usr/bin/perl
+#Copyright (C) 2003  Didenko A.V.
+#created by Didenko A.V. e-Mail:slivarez@list.ru
+
+open cf, "</etc/stc.conf" or die "$!";
+while($line=<cf>){
+    chomp($line);
+    $line=~ s/#.*//;
+    $line=~ s/[\s\t]{1,}/ /;
+    $line=~ s/^[\s\t]{0,}//;
+    if (!$line){next;}
+    @parts=split(" ", $line);
+    $var=shift(@parts);
+    @$var=@parts;
+    $$var=$parts[0];
+}
+close (cf);
+
+system ("$squid_path/squid -k rotate >> $log_file 2>&1");
+system("chown -R $squid_user:$apache_group /var/log/squid");
+sleep 5;
+system ("$limit_path/rotate.pl >> $log_file 2>&1");
+system ("$limit_path/copy_log.pl >> $log_file 2>&1");
+system ("$limit_path/get_version.pl >> $log_file 2>&1");
+

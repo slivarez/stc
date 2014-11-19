@@ -1,0 +1,18 @@
+#########################
+#                       #
+# Squid Traffic Counter #
+#                       #
+#########################
+
+Version:			2.0.20
+Date of last modification:	18.05.2011
+Release:			STABLE
+Development environment:	git, http://sourceforge.net/
+
+
+Please do not remove keywords from scripts and config files!
+Keywords:
+#kill
+@var_name@
+#MOD#
+#INS#

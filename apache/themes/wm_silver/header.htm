@@ -1,0 +1,195 @@
+<!--STC_CONF
+#TAG:	pointer_color COLOR
+#	Defines color of pointer in tables
+#	COLOR can be @RRGGBB format
+pointer_color @DFDFDF
+
+#TAG:	green_font COLOR
+#	Defines color of "green" lighted text
+#	COLOR can be @RRGGBB format
+green_font @00BB00
+
+#TAG:	red_font COLOR
+#	Defines color of "red" lighted tex
+#	COLOR can be @RRGGBB format
+red_font @FF0000
+
+#TAG:	grey_font COLOR
+#	Defines color of "grey" lighted tex
+#	COLOR can be @RRGGBB format
+grey_font @666666
+
+STC_END-->
+<style>
+body {
+	background-color: #E5E5E5;
+	scrollbar-face-color: #DEE3E7;
+	scrollbar-highlight-color: #FFFFFF;
+	scrollbar-shadow-color: #DEE3E7;
+	scrollbar-3dlight-color: #D1D7DC;
+	scrollbar-arrow-color:  #006699;
+	scrollbar-track-color: #EFEFEF;
+	scrollbar-darkshadow-color: #98AAB1;
+}
+/* General font families for common tags */
+font,th,td,p { font-family: Verdana, Arial, Helvetica, sans-serif }
+a:link,a:active,a:visited { color : #006699; }
+a:hover		{ text-decoration: underline; color : #DD6900; }
+hr	{ height: 0px; border: solid #D1D7DC 0px; border-top-width: 1px;}
+
+
+/* This is the border line & background colour round the entire page */
+.bodyline	{ background-color: #FFFFFF; border: 1px #98AAB1 solid; }
+
+/* Main table cell colours and backgrounds */
+td.row1	{ background-color: #EFEFEF; }
+td.row2	{ background-color: #DEE3E7; }
+td.row3	{ background-color: #D1D7DC; }
+
+/*
+  This is for the table cell above the Topics, Post & Last posts on the index.php page
+  By default this is the fading out gradiated silver background.
+  However, you could replace this with a bitmap specific for each forum
+*/
+td.rowpic {
+		background-color: #FFFFFF;
+		background-image: url(../themes/@theme@/images/cellpic2.jpg);
+		background-repeat: repeat-y;
+}
+
+/* Header cells - the blue and silver gradient backgrounds */
+/*color: #FFA34F; font-size: 11px; font-weight : bold;*/
+th	{
+	color: #000000; font-size: 11px; font-weight : bold;
+	background-color: #006699; height: 25px;
+	background-image: url(../themes/@theme@/images/cellpic1.gif);
+}
+
+/*td {
+    font-size : 11px;
+}*/
+TABLE {border:0; cellspacing:0;}
+TABLE TD {FONT: 12px Verdana, Arial, serif; COLOR: #000; padding:0 0 0 0;}
+
+
+td.cat,td.catHead,td.catSides,td.catLeft,td.catRight,td.catBottom {
+			background-image: url(../themes/@theme@/images/cellpic1.gif);
+			background-color:#D1D7DC; border: #FFFFFF; border-style: solid; height: 28px;
+}
+
+td.menu {
+		background-color: #FFFFFF;
+		background-image: url(../themes/@theme@/images/cellpic.gif);
+		background-repeat: repeat-y;
+}
+
+td.head {
+		background-color: #FFFFFF;
+		background-image: url(../themes/@theme@/images/cellpich.gif);
+		background-repeat: repeat-y;
+}
+
+/* General text */
+.gen { font-size : 12px; }
+.genmed { font-size : 11px; }
+.gensmall { font-size : 10px; }
+.gen,.genmed,.gensmall { color : #000000; }
+a.gen,a.genmed,a.gensmall { color: #006699; text-decoration: none; }
+a.gen:hover,a.genmed:hover,a.gensmall:hover	{ color: #DD6900; text-decoration: underline; }
+
+
+/* The register, login, search etc links at the top of the page */
+.mainmenu		{ font-size : 14px; color : #000000 }
+a.mainmenu		{ text-decoration: none; color : #006699;  }
+a.mainmenu:hover{ text-decoration: underline; color : #DD6900; }
+
+/* Form elements */
+input,textarea, select {
+	color : #000000;
+	font: normal 11px Verdana, Arial, Helvetica, sans-serif;
+	border-color : #000000;
+}
+
+/* The text input fields background colour */
+input.post, textarea.post, select {
+	background-color : #FFFFFF;
+}
+
+input { text-indent : 2px; }
+
+/* The buttons used for bbCode styling in message post */
+input.button {
+	background-color : #EFEFEF;
+	color : #000000;
+	font-size: 11px; font-family: Verdana, Arial, Helvetica, sans-serif;
+}
+
+/* The main submit button option */
+input.mainoption {
+	background-color : #FAFAFA;
+	font-weight : bold;
+}
+
+/* None-bold submit button */
+input.liteoption {
+	background-color : #FAFAFA;
+	font-weight : normal;
+}
+
+/* serverstat.cgi */
+th.stat{
+	color: #000000; font-size: 11px; font-weight : bold;
+	background-color: #006699; height: 21px;
+	background-image: url(../themes/@theme@/images/cellpic1.gif);
+	border:1px solid #FAFAFA;
+}
+td.row_ip {
+    color:#000000;
+    font-size:11px;
+    height: 18px;
+    background-color:#DFDFDF;
+    border-left:1px solid #FAFAFA;
+    border-right:1px solid #FAFAFA;
+    border-bottom:1px solid #FAFAFA;
+}
+td.row_stat {
+    background-color:#DFDFDF;
+    font-size:11px;
+    height: 18px;
+    border-right:1px solid #FAFAFA;
+    border-left:1px solid #FAFAFA;
+    border-bottom:1px solid #FAFAFA;
+}
+.img_killconnect{
+    text-decoration:none;
+    font-size:8px;
+    border:1px solid #EFEFEF;
+    }
+.a_killconnect{
+    text-decoration:none;
+    font-size:11px;
+    border: 0px;
+    }
+
+}
+
+</style>
+<BODY>
+<table width=100%>
+<tr><td class="row1" width=140>
+<img src="../themes/@theme@/images/logo.gif">
+</td>
+<td class="head">
+<center><font size=5>@page@</font></center>
+</td>
+</tr>
+<tr><td class="menu" style="text-align:left;">
+    <TABLE width="140">
+    @theme_menu_row_begin@
+    <tr><td class="menu"><span class="mainmenu">
+    <a href="@href@">@name@</a>
+    </td></tr>
+    @theme_menu_row_end@
+    </table>
+</td>
+<td class="row1">

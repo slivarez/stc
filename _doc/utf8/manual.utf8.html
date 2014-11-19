@@ -1,0 +1,712 @@
+<html>
+<head>
+<title>Squid Traffic Counter</title>
+<META http-equiv="Content-Type" content="text/html;charset=utf8">
+</head>
+<body>
+<h1>Squid Traffic Counter 2.0.1</h1>
+<h4>Дата редактирования 14.08.2005</h4>
+<h2><a name="1">Содержание.</a></h2>
+<a href="#1">Содержание</a><br>
+1. <a href="#2">Информация</a><br>
+&nbsp; &nbsp; 1.1. <a href="#3">Возможности системы (2.0.1)</a><br>
+&nbsp; &nbsp; 1.2. <a href="#4">Возможности пользователей</a><br>
+&nbsp; &nbsp; 1.3. <a href="#5">Возможности начальников отделов</a><br>
+&nbsp; &nbsp; 1.4. <a href="#6">Возможности администраторов системы</a><br>
+&nbsp; &nbsp; 1.5. <a href="#7">Системные требования</a><br>
+&nbsp; &nbsp; 1.6. <a href="#8">Контактная информация</a><br>
+2. <a href="#9">Настройка требуемого ПО</a><br>
+&nbsp; &nbsp; 2.1. <a href="#10">Конфигурация squid</a><br>
+&nbsp; &nbsp; 2.2. <a href="#11">Конфигурация squidGuard</a><br>
+&nbsp; &nbsp; 2.3. <a href="#12">Конфигурация Apache</a><br>
+&nbsp; &nbsp; 2.4. <a href="#13">Конфигурация Apache с использованием VirtualHost</a><br>
+3. <a href="#14">Установка проекта</a><br>
+&nbsp; &nbsp; 3.1. <a href="#15">Файлы конфигурации stc.conf и install.conf</a><br>
+4. <a href="#16">Применение проекта</a><br>
+5. <a href="#17">Разрыв соединений</a><br>
+6. <a href="#18">Файлы системы</a><br>
+7. <a href="#19">Модули для STC</a><br>
+8. <a href="#20">Обратите внимание</a><br>
+<br><br>
+<h2><a name="2">1. Информация</a></h2>
+&nbsp; &nbsp; <u><i>Squid Traffic Counter</i></u> - это набор взаимосвязанных скриптов (perl, perl+CGI), позволяющих ввести аутентификацию пользователей и обеспечить контроль их Интернет - трафика. Система включает в себя сайт с набором CGI-скриптов, для обеспечения просмотра статистики а также удаленного администрирования.
+<br><br>
+<i><b>Внимание!</b></i> Т.к. система построена по принципу анализа логов <b>squid</b>'а, она учитывает только тот Интернет-трафик, который идет через прокси-сервер <b>squid</b> (web и ftp, а не POP3, SMTP и пр.).
+<br>
+<i><b>Внимание!</b></i> <b>uninstall</b> удаляет все директории STC полностью, поэтому устанавливайте STC в отдельные директории (например в /usr/local/stc/etc, /usr/local/stc/limit, /usr/local/stc/sarg), как написано в install.conf по умолчанию, или не пользуйтесь скриптом <b>uninstall</b>, т.к. можете потерять ваши файлы.
+<br><br>
+
+
+<h3><a name="3">1.1 Возможности системы (2.0.1):</a></h3>
+<UL>
+<LI> выделение лимита трафика по каждому пользователю на месяц (или любой другой период);
+<LI> автоматическое отключение пользователей превысивших лимит;
+<LI> автоматический обрыв текущих сеансов закачки у "перебравших" или только что заблокированных пользователей [<font color="red"><b>new!</b></font>];
+<LI> ведение отчетов по использованию пользователями ресурсов интернет;
+<LI> разделение всех пользователей на 3 категории: администраторы, начальники отделов, пользователи;
+<LI> расширенное управление привилегиями начальников отделов [<font color="red"><b>new!</b></font>];
+<LI> управление подразделениями через веб-интерфейс [<font color="red"><b>new!</b></font>];
+<LI> разделение пользователей по подразделениям (отделам);
+<LI> удаленное администрирование системы через вэб-интерфейс;
+<LI> использование различных дизайнов для вэб-интерфейса;
+<LI> использование различных языковых файлов;
+<LI> возможность каждому пользователю назначить любой из доступных веб-интерфейсов [<font color="red"><b>new!</b></font>];
+<LI> рассылка сообщений (в т.ч. и массовых) пользователям(и) внутри системы;
+<LI> для работы не требует каких-либо СУБД;
+<LI> поддержка видов авторизации в squid: ncsa, ntlm, digest
+<LI> управление скоростью доступа (squid delay_pools) [<font color="red"><b>new!</b></font>];
+</UL>
+
+<h3><a name="4">1.2 Возможности пользователей:</a></h3>
+<UL>
+<LI> просмотр текущего состояния своих акаунтов;
+<LI> просмотр своих отчетов (ежедневные/недельные/ежемесячные) по использованию ресурсов Интернет;
+<LI> изменение собственного пароля на доступ в Интернет;
+<LI> отправление сообщений любому пользователю или Администратору системы (зависит от настроек системы);
+</UL>
+
+<h3><a name="5">1.3 Возможности начальников отделов:</a></h3>
+<UL>
+<LI> просмотр текущего состояния своих акаунтов;
+<LI> просмотр текущего состояния акаунтов пользователей своего подразделения;
+<LI> просмотр своих отчетов (ежедневные/недельные/ежемесячные) по использованию ресурсов Интернет;
+<LI> просмотр отчетов (ежедневные/недельные/ежемесячные) по использованию ресурсов Интернет по всем пользователям своего подразделения;
+<LI> управление квотами на трафик внутри своего подразделения (если это разрешено Администратором системы) [<font color="red"><b>new!</b></font>]; 
+<LI> управление резервами трафика по своим подразделениям (если это разрешено Администратором системы) [<font color="red"><b>new!</b></font>];
+<LI> управление пользователями по своим подразделениям (добавление, удаление, перенос и т.д., если это разрешено Администратором системы) [<font color="red"><b>new!</b></font>];
+<LI> изменение собственного пароля на доступ в Интернет;
+<LI> отправление сообщений любому пользователю или Администратору системы (зависит от настроек системы);
+</UL>
+
+<h3><a name="6">1.4 Возможности администраторов системы:</a></h3>
+<UL>
+<LI> просмотр текущего состояния своего акаунта;
+<LI> просмотр текущего состояния акаунтов по всем (любому) пользователям(лю);
+<LI> просмотр своих отчетов (ежедневные/недельные/ежемесячные) по использованию ресурсов Интернет;
+<LI> просмотр отчетов (ежедневные/недельные/ежемесячные) по использованию ресурсов Интернет по всем (любому) пользователям;
+<LI> управление квотами на трафик любого пользователя; 
+<LI> изменение собственного пароля на доступ в Интернет;
+<LI> изменение пароля на доступ в Интернет любого пользователя;
+<LI> просмотр/изменение информации по любому пользователю;
+<LI> блокировка любого пользователя;
+<LI> полная блокировка/разблокировка доступа в Интернет;
+<LI> добавление новых пользователей;
+<LI> удаление любого пользователя;
+<LI> управление привилегиями начальников отделов (в том числе создание начальников) [<font color="red"><b>new!</b></font>];
+<LI> создание/удаление отделов [<font color="red"><b>new!</b></font>];
+<LI> управление резервом по отделам [<font color="red"><b>new!</b></font>];
+<LI> отправление сообщений любому пользователю или Администратору системы (зависит от настроек системы);
+<LI> массовая рассылка сообщений любому подразделению или всем пользователям;
+</UL>
+
+      
+<h3><a name="7">1.5 Системные требования.</a></h3>
+К железу определенных претензий нет :), т.е. если производительности вашего сервера хватает для нормальной работы squid’а, то и для STC ее хватит точно.<br>
+Для нормальной работы STC необходимо предварительно установить следующее ПО:<br>
+<OL TYPE=1>
+<LI> squid-2.4.STABLE1 и выше, собраный с опцией --enable-auth=basic
+<LI> squidGuard (необходим!)
+<LI> Apache (желательно с поддержкой suexec)
+<LI> sarg-1.4.1 или sarg-2.0
+<LI> libpcap
+<LI> Модули для перла (perl modules):
+<UL TYPE=disc>
+<LI> Apache-Htpasswd-1.5.5
+<LI> NetPacket
+<LI> NetPacket
+<LI> Net-PcapUtils
+<LI> Net-RawIP
+<LI> Hijack_stc (см. stc-2.*/_modules/hijack_stc/)
+</UL>
+</OL>
+
+<h3><a name="8">1.6 Контактная информация:</a></h3>
+<a href="http://stc.nixdev.org" target="_blank">http://stc.nixdev.org</a> сайт системы, здесь все новые версии, модули для вэб-интерфейса, форум, новые проекты и прочее;<br>
+<a href="http://stc.nixdev.org/forum" target="_blank">http://stc.nixdev.org/forum</a> техническая поддержка;<br>
+<a href="mailto:slivarez@list.ru">slivarez@list.ru</a> e-Mail разработчика STC.<br>
+
+
+
+
+
+<br><br><br><br>
+<h2><a name="9">2. Настройка требуемого ПО</a></h2>
+<b>Внимание!</b> Для STC-2.0.1 и выше необходим <b>squidGuard</b>, поэтому в данной документации рассматривается конфигурация <b>squid</b> ТОЛЬКО совместно с <b>squidGuard</b>.<br>
+<br>
+<br>
+<br>
+
+<h3><a name="10">2.1 Конфигурация squid.</a></h3>
+В файле <a href="#squid_conf_path" title="Путь расположения конфигурационных файлов squid">squid_conf_path</a>/squid.conf должны быть следующие строки:<br>
+<pre>
+...
+logfile_rotate 5
+emulate_httpd_log off
+
+auth_param basic program /usr/local/libexec/ncsa_auth <font style="color:#55bbbb">$stc_path</font>/password  #(для FreeBSD)
+#auth_param basic program /usr/lib/squid/ncsa_auth <font style="color:#55bbbb">$stc_path</font>/password #(для Linux)
+
+auth_param basic children 5
+auth_param basic realm Squid proxy-caching web server
+auth_param basic credentialsttl 2 hours
+
+redirect_program /usr/local/bin/squidGuard -c <font style="color:#55bbbb">$SGC_path</font>/squidGuard.conf
+redirect_children 5
+redirector_bypass on
+
+acl trusted_users src "<font style="color:#55bbbb">$stc_path</font>/trusted_users"
+acl all_users proxy_auth REQUIRED
+
+http_access allow trusted_users
+http_access allow all_users
+http_access deny all
+...
+</pre>
+
+<b>Примечание.</b> <i>Переменная <font style="color:#55bbbb">$stc_path</font> (<font style="color:#55bbbb">$SGC_path</font>) должна быть заменена на значение тега <a href="#stc_path" title="Путь расположения конфигурационных файлов STC">stc_path</a> (<a href="#SGC_path" title="Path to squidGuard.conf">SGC_path</a>) указанное в файле конфигурации <a href="#15" title="Описание файла stc.conf">stc.conf</a></i>.
+<br>
+<br>
+<br>
+<br>
+
+
+
+<h3><a name="11">2.2 Конфигурация squidGuard.</a></h3>
+<b>Внимание!</b> Этот конфигурационный файл генерируется автоматически скриптом install, вам лишь необходимо убедится в правельности путей и существовании у вас необходимых баз данных (blacklist)<br><br>
+
+В файле <a href="#SGC_path" title="Путь расположения конфигурационных файлов squidGuard">SGC_path</a>/squidGuard.conf должны быть следующие строки:<br>
+<pre>
+...
+src trusted_users {
+    iplist <font style="color:#55bbbb">@stc_path@</font>/trusted_users
+}
+src good_users {
+    userlist <font style="color:#55bbbb">@stc_path@</font>/allow.users
+}
+src bad_users {
+    userlist <font style="color:#55bbbb">@stc_path@</font>/deny.users
+}
+src blocked_users {
+    userlist <font style="color:#55bbbb">@stc_path@</font>/blocked.users
+}
+dest local_site {
+    urllist <font style="color:#55bbbb">@stc_path@</font>/local.urls
+}
+acl {
+
+    trusted_users {
+    pass any
+    }
+
+    good_users {
+    pass !porn !proxy any
+    redirect http://<font style="color:#7799bb">@site_ip@</font>/stat/messages/deny.cgi
+    }
+
+    bad_users {
+    pass local_site none
+    redirect http://<font style="color:#7799bb">@site_ip@</font>/stat/messages/limit.cgi
+    }
+
+    blocked_users {
+    pass none
+    redirect http://<font style="color:#7799bb">@site_ip@</font>/stat/messages/blocked.cgi
+    }
+
+    default {
+    pass local_site none
+    redirect http://<font style="color:#7799bb">@site_ip@</font>/stat/messages/unknown.cgi
+    }
+}
+</pre>
+<b>Примечание.</b> <i>Переменные <font style="color:#7799bb">@site_ip@</font> и <font style="color:#55bbbb">@stc_path@</font> должны быть заменены на соответствующие значения <a href="#site_ip" title="IP адрес сервера">site_ip</a> и <a href="#stc_path" title="Путь расположения конфигурационных файлов STC">stc_path</a> указанные в файле конфигурации <a href="#15" title="Описание файла stc.conf">stc.conf</a></i>.
+<br>
+<br>
+<br>
+<br>
+
+
+<h3><a name="12">2.3 Конфигурация Apache</a></h3>
+В конфиге апача (httpd.conf) должны быть следующие строки:
+
+<pre>
+&lt;Directory "<font style="color:#55bbbb">$www_data_path</font>/stat"&gt; 
+    Options Indexes FollowSymLinks MultiViews 
+    AllowOverride All 
+    Order allow,deny 
+    Allow from all 
+&lt;/Directory&gt;
+
+ScriptAlias /stat/cgi/ "<font style="color:#55bbbb">$www_data_path</font>/stat/statist/"
+&lt;Directory "<font style="color:#55bbbb">$www_data_path</font>/stat/statist"&gt;
+    AllowOverride None
+    Options ExecCGI 
+
+    AuthType Basic
+    AuthName "Statistic"
+    AuthUserFile <font style="color:#7799bb">$stc_path</font>/password
+    Require valid-user
+    Order allow,deny
+    Allow from all
+&lt;/Directory&gt;
+
+ScriptAlias /stat/messages/ "<font style="color:#55bbbb">$www_data_path</font>/stat/messages/"
+&lt;Directory "<font style="color:#55bbbb">$www_data_path</font>/stat/messages"&gt;
+    AllowOverride None
+    Options ExecCGI
+    Order allow,deny
+    Allow from all
+&lt;/Directory&gt;
+</pre>
+<b>Примечание.</b> <i>Переменные <font style="color:#55bbbb">$www_data_path</font> и <font style="color:#7799bb">$stc_path</font> должны быть заменены на соответствующие значения <a href="#www_data_path" title="Путь расположения корня html документов STC">www_data_path</a> и <a href="#stc_path" title="Путь расположения конфигурационных файлов STC">stc_path</a> указанные в файле конфигурации <a href="#15" title="Описание файла stc.conf">stc.conf</a></i>.
+<br>
+<br>
+<br>
+<br>
+
+
+
+<h3><a name="13">2.4 Конфигурация Apache с использованием VirtualHost</a> (<i>Рекомендуемая настройка!</i>)</h3>
+Предварительно необходимо создать пользователя stc и соотв. группу stc. Наш путь для STC будет /home/stc/public_html.<br> Для наиболее надежной и безопасной работы STC необходимо собрать Apache с поддержкой suexec. Например запустить ./configure с такими опциями:<br>
+<pre>./configure --enable-suexec --suexec-logfile=/var/log/suexec_log --suexec-userdir=public_html</pre>
+В конфигурационном файле апача (httpd.conf) должны быть следующие строки:
+<pre>
+&lt;VirtualHost <font style="color:#9999bb">$site_ip</font>&gt;
+    ServerAdmin root@localhost
+    Options Indexes FollowSymlinks MultiViews
+    DocumentRoot <font style="color:#55bbbb">$www_data_path</font>
+    ServerName <font style="color:#BB5555">your.domen.com</font>		 			#Здесь нужно прописать хост
+    ErrorLog logs/<font style="color:#BB5555">your.domen.com</font>_error_log
+    CustomLog logs/<font style="color:#BB5555">your.domen.com</font>_access_log common
+    User stc	#For apache2:  SuexecUserGroup stc stc
+    Group stc
+    AccessFileName .htaccess
+    ScriptAlias /stat/cgi/ "/home/stc/public_html/stat/statist/"
+    ScriptAlias /~stc/stat/cgi/ "/home/stc/public_html/stat/statist/"
+    &lt;Directory "/home/stc/public_html/stat"&gt;
+        Options Indexes FollowSymlinks MultiViews
+        AllowOverride All
+        Order allow,deny
+        Allow from all
+    &lt;/Directory&gt;
+    &lt;Directory "/home/stc/public_html/stat/statist"&gt;
+        AddHandler cgi-script .cgi .pl
+        Options +ExecCGI
+        AuthType Basic
+        AuthName "STC WEB-server"
+        AuthUserFile <font style="color:#77aa33">$stc_path</font>/password
+        Require valid-user
+        Order allow,deny
+        Allow from all
+    &lt;/Directory&gt;
+    &lt;Directory "/home/stc/public_html/stat/messages"&gt;
+        AddHandler cgi-script .cgi .pl
+        Options +ExecCGI
+        Order allow,deny
+        Allow from all
+    &lt;/Directory&gt;
+&lt;/VirtualHost&gt;
+</pre>
+
+При использовании VirtualHost необходимо установить права и владельцев на директории:
+<pre>
+ chown -R stc:stc <font style="color:#77aa33">$stc_path</font>
+ chmod 660 <font style="color:#77aa33">$stc_path</font>/*
+ chmod 660 <font style="color:#77aa33">$stc_path</font>/profiles/*
+ chmod 660 <font style="color:#77aa33">$stc_path</font>/includes/*
+ chmod 640 <font style="color:#77aa33">$stc_path</font>/password.digest
+ chmod 644 <font style="color:#77aa33">$stc_path</font>/password
+ chgrp $squid_group <font style="color:#77aa33">$stc_path</font>/password.digest
+ chgrp $squid_group <font style="color:#77aa33">$stc_path</font>/password
+</pre>
+
+<b>Обратите внимание:</b>
+<OL>
+<LI> Не забудьте создать пользователя <b>stc</b> (group <b>stc</b>) в системе.
+<LI> При использовании VirtualHost необходимо поместить веб-интерфейс в <b>/home/stc/public_html</b> директорию (предварительно ее создать), т.е. прописать тег “<font style="color:#55bbbb">$www_data_path</font> /home/stc/public_html” в install.conf перед <b><u>установкой</u></b>. При такой конфигурации apache доступ к скриптам stc можно получить либо по http://VIRTUALHOST/stat/cgi/statistic.cgi либо по http://VIRTUALHOST_IP/~stc/stat/cgi/statistic.cgi 
+<LI> Замените "$squid_group" в примере на значения squid_group из /etc/<a href="#15" title="Описание файла stc.conf">stc.conf</a>
+<LI> <font style="color:#77aa33">$stc_path</font>/password должен быть <b>не</b>доступным для чтения для ALL (chmod 640)
+<LI> <font style="color:#77aa33">$stc_path</font>/password.digest должен быть <b>не</b>доступным для чтения для ALL (cmod 640)
+<LI> Замените значения тегов apache_user и apache_group в <a href="#15" title="Описание файла stc.conf">stc.conf</a> на пользователя и группу из VirtualHost (в рассматриваемом примере это: apache_user stc; apche_group stc )
+<LI> Рабочий образец такого конфига лежит в stc-2.0.1*/etc/apache_stc.conf
+</OL>
+<b>Примечание.</b> <i>Переменные <font style="color:#77aa33">$stc_path</font>, <font style="color:#9999bb">$site_ip</font> и <font style="color:#55bbbb">$www_data_path</font> должны быть заменены на соответствующие значения <a href="#stc_path" title="Путь расположения конфигурационных файлов STC">stc_path</a>, <a href="#site_ip" title="IP адрес сервера">site_ip</a> и <a href="#www_data_path" title="Путь расположения корня html документов STC">www_data_path</a> указанные в файле конфигурации <a href="#15" title="Описание файла stc.conf">stc.conf</a></i>.
+<br>
+<br>
+<br>
+<br>
+
+
+
+
+
+
+
+<h2><a name="14">3. Установка проекта.</a></h2>
+      Для установки проекта необходимо разархивировать архив stc-2.0.x.tar, отредактировать файл install.conf в соответствии с вашими приложениями и настройками, после чего в каталоге stc-2.0.x выполнить ./install. После чего отредактировать файлы:<br>
+<br>
+      /etc/stc.conf<br>
+      /your_path/squid.conf<br>
+      /your_path/httpd.conf<br>
+      /your_path/squidGuard.conf – в stc-1.2.8 (и выше) файл редактируется автоматически скриптом install при установке, можете проверить пути и убедится в существовянии необходимых БД.<br>
+<br>
+      После запуска скрипта install и редактирования конфигов перезапустите сервисы:
+<UL>
+<LI> squid (squid –k reconfigure)
+<LI> apache (apachetcl restart или httpd –k restart – для apache2)
+<LI> убедитесь что в /etc/crontab прописались скрипты STC
+</UL>
+Во время установки создается один отдел №190 (o190.users), и пользователь dummy с паролем dummypass с правами администратора.
+
+
+
+<br><br><br><b>Что мы не рекомендуем делать с STC, так как она перестанет работать:</b>
+<UL>
+<LI> удалять в скриптах строчки «#MOD# do not remove this!!!»;
+<LI> удалять/изменять скрипты в $limit_path/*.
+<LI> удалять/изменять скрипты в $www_data_path/*.
+<LI> изменять в shablon.conf строку <b>access_log /var/access.log</b> - просто перестанет генерить отчеты
+</UL>
+
+<b>На что мы сразу не согласны:</b>
+<UL>
+<LI> удаление копирайтов
+<LI> изменение копирайтов
+</UL>
+<br><br>
+
+
+
+<h3><a name="15">3.1 Файлы конфирурации stc.conf и install.conf</a></h3>
+Файл <b>install.conf</b> и <b>stc.conf</b> отличаются тем, что stc.conf создается при установке из install.conf. Различие между этими файлами большое.
+
+<h4>Файл install.conf</h4>
+Файл install.conf нужен системе STC для установки. 
+Большинство тегов может быть установлено в автоматический режим (<b>auto</b>), т.е. файл install сам определит, в зависимости от имени ОС, какое значение использовать. 
+Как install будет принимать тот или иной тег расписано в файле install.conf, поэтому если тег будет отличаться от настроек вашей системы, укажите его напрямую, заменив слово <b>auto</b> на правильное значение.
+<br>
+<i>Внимание! <b>install</b> чувствителен к регистру.</i>
+
+<h4>Файл stc.conf</h4>
+Файл stc.conf нужен системе STC для работы. Его место в /etc.
+В отличии от install.conf у него нет автоматического режима, поэтому все теги должны быть определены.
+<br>
+<i>Внимание! Система <b>STC</b> чувствителенa к регистру.</i>
+
+<br><br>
+Приведенная ниже таблица подходит в качестве справочника для stc.conf и install.conf<br>
+<b>F</b> - значение по умолчанию в install.conf для <b>FreeBSD</b><br>
+<b>L</b> - значение по умолчанию в install.conf для <b>Linux</b><br>
+<center>
+<table cellPadding=1 cellSpacing=1 width="99%" bgcolor=#111111 border=0 aling=center>
+<tr><td width=100%>
+<table cellPadding=3 cellSpacing=0 width="100%" bgcolor=fdfdfd border=1>
+<tr>
+    <th>Тег</th>
+    <th>Значение по умолчанию</th>
+    <th>Описание тега</th>
+</tr>
+
+
+
+<tr><td colspan=3><b>Main STC configuration</b><td></tr>
+<tr>
+    <td><a name="site_ip">site_ip</a></td>
+    <td>127.0.0.1</td>
+    <td>IP адрес сервера. Если на сервере два серевых интерфейса, то указывается внутренний</td>
+</tr>
+<tr>
+    <td><a name="stc_path">stc_path</a></td>
+    <td>/usr/local/stc/etc</td>
+    <td>Путь расположения конфигурационных файлов STC. Путь может быть изменен</td>
+</tr>
+<tr>
+    <td><a name="language">language</a></td>
+    <td>rus-1251 | rus-koi8 | english</td>
+    <td><b>New!</b> Локализация применяемая для формирования документов STC. <br><b>Внимание!</b> Не путайте с win-1251.</td>
+</tr>
+<tr>
+    <td><a name="log_file">log_file</a></td>
+    <td>/var/log/stc_error.log</td>
+    <td><b>New!</b> Файл отчета для вывода ошибок</td>
+</tr>
+<tr>
+    <td><a name="divide_char">divide_char</a></td>
+    <td>\</td>
+    <td><b>New!</b> Cимвол-разделитель между полями ИМЯ_ДОМЕНА и ИМЯ_ПОЛЬЗОВАТЕЛЯ в логе access.log - необходим ТОЛЬКО для NTLM аутентификации</td>
+</tr>
+<tr>
+    <td><a name="limit_path">limit_path</a></td>
+    <td>/usr/local/stc/limit</td>
+    <td>Путь расположения файлов запускаемых из под планировщика заданий по расписанию <b>cron</b></td>
+</tr>
+<tr>
+    <td><a name="SC_path">SC_path</a></td>
+    <td>/usr/local/stc/sarg</td>
+    <td><i>Sarg Conf Path</i><br>Путь расположения конфигурационных файлов формирователя отчетов это не путь к файлам /etc/sarg. <br><b>Внимание!</b> у STC используется своя настройка для <b>sarg</b></td>
+</tr>
+<tr>
+    <td><a name="www_data_path">www_data_path</a></td>
+    <td>/usr/local/www/data</td>
+    <td>Путь расположения корня html документов STC</td>
+</tr>
+
+<tr>
+    <td><a name="reports_dir">reports_dir</a></td>
+    <td>/var/stc/reports</td>
+    <td><b>New!</b> Путь расположения отчетов создаваемых STC c помощью sarg</td>
+</tr>
+<tr>
+    <td><a name="mega_byte">mega_byte</a></td>
+    <td>1000000 | 1048576</td>
+    <td>Определяет сколько байт в «вашем» мегабайте (default: 1000000)</td>
+</tr>
+
+
+
+<tr><td colspan=3><b>Squid, Apache, SARG and redirector configuration</b><td></tr>
+<tr>
+    <td><a name="access_log">access_log</a></td>
+    <td><b>F:</b> /usr/local/squid/logs/access.log<br><b>L:</b> /var/log/squid/access.log</td>
+    <td>Полный путь к файлу access.log.<br> Для ОС Линукс путь может быть /var/log/squid/access.log</td>
+</tr>
+<tr>
+    <td><a name="SGC_path">SGC_path</a></td>
+    <td><b>F:</b> /usr/local/squid/etc<br><b>L:</b> /etc/squid</td>
+    <td><i>SquidGuard Conf Path</i><br>Путь расположения конфигурационных файлов squidGuard.</td>
+</tr>
+<tr>
+    <td><a name="squid_conf_path">squid_conf_path</a></td>
+    <td><b>F:</b> /usr/local/squid/etc<br><b>L:</b> /etc/squid</td>
+    <td>Путь расположения конфигурационных файлов squid</td>
+</tr>
+<tr>
+    <td><a name="squid_path">squid_path</a></td>
+    <td><b>F:</b> /usr/local/squid/sbin<br><b>L:</b> /usr/sbin</td>
+    <td>Путь расположения бинарных файлов squid</td>
+</tr>
+<tr>
+    <td><a name="service_to_reload">service_to_reload</a></td>
+    <td>squid | squidGuard</td>
+    <td><b>New!</b> Определяет какой демон мы будет реконфигурировать</td><br>
+</tr>
+<tr>
+    <td>squid_user</td>
+    <td>squid</td>
+    <td><b>New!</b> Имя пользователя, от которого запускается squid</td>
+</tr>
+<tr>
+    <td>squid_group</td>
+    <td>squid</td>
+    <td><b>New!</b> Группа пользователей, от которого запускается squid</td>
+</tr>
+<tr>
+    <td>apache_user</td>
+    <td><b>F:</b> www<br><b>L:</b> apache</td>
+    <td><b>New!</b> Имя пользователя, от которого запускается apache</td>
+</tr>
+<tr>
+    <td>apache_group</td>
+    <td><b>F:</b> www<br><b>L:</b> apache</td>
+    <td><b>New!</b> Группа пользователей, от которого запускается apache</td>
+</tr>
+<tr>
+    <td><a name="sarg_path">sarg_path</a></td>
+    <td><b>F:</b> /usr/local/bin<br><b>L:</b> /usr/sbin</td>
+    <td>Путь расположения бинарных файлов sarg</td>
+</tr>
+<tr>
+    <td><a name="sarg_version">sarg_version</a></td>
+    <td>1.4.1 | 2.0.9 и т.п.</td>
+    <td><b>New!</b> Версия используемого вами sarg</td>
+</tr>
+<tr>
+    <td><a name="exclude_hosts">exclude_hosts</a></td>
+    <td>/usr/local/stc/etc/exclude_hosts</td>
+    <td>Доменные имена сайтов и/или их IP адреса, трафик с которых не учитывается</td>
+</tr>
+<tr>
+    <td><a name="local_eth_device">local_eth_device</a></td>
+    <td>eth0</td>
+    <td><b>New!</b> Сетевой интерфейс локальной сети, используемый для обрыва соединений</td>
+</tr>
+
+
+<tr><td colspan=3><b>WEB-messages control</b><td></tr>
+
+
+<tr>
+    <td>web_messages</td>
+    <td>all | admin | none</td>
+    <td>определяет кто имеет доступ с отправке сообщений:
+<UL>
+<LI>admin - админы могут отсылать сообщения любому юзеру, юзеры могут только отвечать админам; 
+<LI>all - все всем;
+<LI>none - сообщения недоступны
+<UL></td>
+</tr>
+<tr>
+    <td>web_mes_per_page</td>
+    <td>15</td>
+    <td>Количество сообщений на одной странице</td>
+</tr>
+</table>
+</td></tr>
+</table>
+</center>
+
+
+
+<h2><a name="16">4. Применение проекта.</a></h2>
+Для учета трафика по пользователям необходимо запускать:
+- $limit_path/stat раз в 1(2) минуты.
+- $limit_path/squid_rotate раз в 30 минут.
+- $limit_path/monthly_rotate раз в месяц (если запускать его раз в неделю, то лимиты по пользователям будут выделяться на неделю, раз в день – на день и т.д. J ).
+Эти и другие файлы прописываются в /etc/crontab автоматически программой install.
+
+Основной скрипт проекта, который собственно считает трафик и разрешает/запрещает доступ, работает меньше секунды (P-4 2.4Ghz, 128М-ОЗУ, HDD-40Gb IDE, 85 пользователей, время работы скрипта ~0.124 сек).
+
+
+
+
+<h2><a name="17">5. Разрыв соединений</a></h2>
+Разрыв соединений
+<pre>
+  Для работы разрыва соединений необходимо установить дополнительные модули.
+     libpcap		http://www.tcpdump.org/release/libpcap-0.8.3.tar.gz
+     NetPacket		http://search.cpan.org/CPAN/authors/id/A/AT/ATRAK/NetPacket-0.04.tar.gz
+     Net-Pcap		http://search.cpan.org/CPAN/authors/id/K/KC/KCARNUT/Net-Pcap-0.05.tar.gz
+     Net-PcapUtils	http://search.cpan.org/CPAN/authors/id/T/TI/TIMPOTTER/Net-PcapUtils-0.01.tar.gz
+     Net-RawIP		http://search.cpan.org/CPAN/authors/id/S/SK/SKOLYCHEV/Net-RawIP-0.1.tar.gz
+  Также эти модели можно скачать с ftp.driver-vrn.ru/pub/stc.
+  После загрузки - распакуйте архивы tar -xvzf libpcap-0.8.3.tar.gz и выполните установку libpcap:
+    configure
+    make
+    make install
+  Для всех остальных tar -xvzf Net*
+    perl Makefile.PL
+    make
+    make test
+    make install
+</pre>
+  Не устанавливайте libpcap если у Вас она уже установлена. А проверить - очень легко. Попробуйте установить какой-то модуль и посмотрите на вывод.
+  Для того, чтобы STC мог автоматически обрывать текущие сеансы закачки у "перебравших" или только что заблокированных пользователей, необходимо установить патч extacclog на squid. При пропатченном сквиде и включенных drop_connections в stc.conf никто сверх лимита много не накачает (разве что самую малость до следующего запуска stat скрипта) ;-)
+
+
+
+
+<h2><a name="18">6. Файлы системы:</a></h2>
+(устаревшая инфа, скоро заапдейтим)
+<OL>
+<LI> <b>/etc/stc.conf</b> – файл конфигурации для системы.
+<LI> <b>$stc_path/allign.otdel</b> – в этом файле хранится информация о взаимосвязи между номерами отделов и их символьными именами. Формат:
+<pre>
+Номер1:Полное имя отдела 1
+Номер2:Полное имя отдела 2
+</pre>
+Если в отдел существует (есть соответствующий файл oXX.users), но нет информации о его имени в allign.otdel, то в качестве имени используется номер этого отдела.
+Внимание! В описании отделов (номер:имя) перед и после ':' ставить пробелы нельзя.
+<LI> <b>$stc_path/traffic.users</b> – файл, в котором хранятся данные о пользовательских квотах на месяц. Данные хранятся в таком формате:
+имя_пользователя1 квота_пользователя1_в_байтах
+имя_пользователя2 квота_пользователя2_в_байтах
+      комментарии в данном файле запрещены.
+<LI> <b>$stc_path/admin.users</b> – здесь хранятся имена администраторов сети.
+<LI> <b>$stc_path/boss.users</b> – файл, в котором хранятся имена начальников отделов в след. формате:
+имя_нач. номер_отдела1 номер_отдела2 номер_отдела3 и т.д.
+<LI> <b>$stc_path/cur_tr.users</b> – файл, в котором хранятся текущие значения закачанной пользователями информации, создается скриптом rotate.sh.
+<LI> <b>$stc_path/allow.users</b> – файл создается скриптом allowusers.sh и содержит список пользователей, которым разрешен доступ в Интернет.
+<LI> <b>$stc_path/deny.users</b> – файл создается скриптом userstat.sh и содержит список пользователей, которым запрещен доступ в Интернет.
+<LI> <b>$stc_path/oXX.users</b> – список всех пользователей по отделам, где XX – номер отдела.
+<LI> <b>$stc_path/o111users</b> – список супер-пользователей, которые не вносятся в отчеты и могут просматривать статистику по всем отделам.
+<LI> <b>$stc_path/trusted_users</b> – список IP- адресов, которые имеют доступ в Интернет без аутентификации и учета трафика.
+<LI> <b>$stc_path/password</b> – файл пользователей и паролей в формате Apache аутентификации.
+<LI> <b>$stc_path/htpasswd</b> – программа для изменения пользовательских паролей или создания новых пользователей в файле password.
+<LI> <b>$stc_path/messages/users/</b> – здесь хранятся директории с вэб-сообщениями по пользователям
+<LI> <b>$SGC_path/squidGuard.conf</b> – файл конфигурации для редиректора.
+<LI> <b>$stc_path/squidGuard.conf.allow</b> – файл-конфиг для squidGuard, необходимый для работы block.cgi и unblock.cgi (разрешенный интернет).
+<LI> <b>$stc_path/squidGuard.conf.profil</b> – файл-конфиг для squidGuard, необходимый для работы block.cgi и unblock.cgi (интернет на профилактике).
+<LI> <b>$stc_path/local.domains</b> – в этом файле прописываются локальные Domain Names для которых доступ открыт ВСЕМ пользователям (например: сайт STC со статистикой).
+<LI> <b>$limit_path/monthly_rotate</b> – скрипт обнуляет текущий трафик по пользователям (удаляет файл cur_tr.users) и выполняет squid_rotate.
+<LI> <b>$limit_path/squid_rotate</b> – файл, который запускает скрипт rotate.sh, copy_log.sh и выполняет команду squid –k rotate.
+<LI> <b>$limit_path/rotate.sh</b> – скрипт анализирует файлы cur_tr.users и access.log и записывает новые значения текущего трафика по пользователям в файл cur_tr.users.
+<LI> <b>$limit_path/copy_log.sh</b> – скрипт создает файл /usr/local/suid/logs/access.log.mXX, где XX – текущий месяц, в этом логе хранится вся информация за месяц.
+<LI> <b>$limit_path/stat</b> – файл, который запускает скрипты userstat.sh, allowusers.sh и выполняет перезапуск squid'а (/usr/local/sbin/squid –k reconfigure).
+<LI> <b>$limit_path/userstat.sh</b> – анализирует лог-файл squid'а (/usr/local/squid/logs/access.log) и файл с пользовательскими квотами ($stc_path/ttraffic.users) и записывает пользователей, превысивших квоты в файл $stc_path/deny.users.
+<LI> <b>$limit_path/allowusers.sh</b> – анализирует файлы $stc_path/deny.users и $stc_path/password, результатом работы скрипта является файл $stc_path/allow.users, в который записываются все пользователи, которых нет в файле deny.users но есть в файле password.
+<LI> <b>$SC_path/run_sarg.sh</b> – создает отчеты по отделам (1 раз в день) и размещает их в каталогах $www_data_path/stat/sarg/oXX, где XX – номер соответствующего отдела.
+<LI> <b>$SC_path/run_sarg_w.pl</b> – создает отчеты по отделам (1 раз в неделю) и размещает их в каталогах $www_data_path/stat/sarg/weekly/oXX, где XX – номер соответствующего отдела.
+<LI> <b>$SC_path/run_sarg_m.pl</b> – создает отчеты по отделам (1 раз в месяц) и размещает их в каталогах $www_data_path/stat/sarg/monthly/oXX, где XX – номер соответствующего отдела.
+<LI> <b>$SC_path/sarg_rep</b> – sh-скрипт необходимый для работы run_sarg_w.pl.
+<LI> <b>$SC_path/user_rep_d.pl</b> – создает персональные ежедневные отчеты по пользователям, принцип работы: скрипт читает список пользователей из файла $stc_path/password после чего по КАЖДОМУ пользователю создает папку $www_data_path/stat/sarg/users/daily/$user_name, в которой будут храниться ежедневные отчеты пользователя, доступ к отчетам имеет только этот пользователь. Сами отчеты генерируются sarg'ом из скрипта run_sarg и лежат в $www_data_path/stat/sarg/total. Скрипт user_rep_d.pl выбирает ПОСЛЕДНЮЮ директорию с отчетами, созданную sarg'ом (выборка по дате, поэтому будьте аккуратны при работе в $www_data_path/stat/sarg/total, т.к. можете поменять дату директории, что отразится на работе скрипта), затем копирует пользовательские отчеты в папку $www_data_path/stat/sarg/users/daily/$user_name.
+<LI> <b>$SC_path/user_rep_w.pl</b> – создает персональные недельные отчеты по пользователям, принцип работы аналогичен user_rep_d.pl, только отчеты хранятся в директории $www_data_path/stat/sarg/users/weekly/$user_name.
+<LI> <b>$SC_path/user_rep_m.pl</b> – создает персональные ежемесячные отчеты по пользователям, принцип работы аналогичен user_rep_d.pl, только отчеты хранятся в директории $www_data_path/stat/sarg/users/monthly/$user_name.
+<LI> <b>$SC_path/shablon.conf</b> – файл, необходимый для работы STC, используется в качестве шаблона при создании отчетов sarg'ом. НЕ ДОБАВЛЯЙТЕ в этот файл тэг output_dir.
+<LI> <b>$www_data_path/stat/index.html</b> – страница пользователей, на которой находятся ссылки на CGI скрипты statistic.cgi, report.cgi, chpasswd.cgi. 
+<LI> <b>$www_data_path/stat/info.html</b> – страница с информацией для пользователей.
+<LI> <b>$www_data_path/stat/statist/statistic.cgi</b> – выводит статистику пользователя, для администраторов (admin.users) сети выводит ссылку на total.cgi и st.cgi, для начальников отделов (boss.users) выводит ссылку на total_otd.cgi.
+<LI> <b>$www_data_path/stat/statist/report.cgi</b> – страница с персональными отчетами пользователя (для администратора ссылки на общие отчеты по отделам и по всем пользователям).
+<LI> <b>$www_data_path/stat/statist/total.cgi</b> – выводит статистику по всем пользователям.
+<LI> <b>$www_data_path/stat/statist/st.cgi</b> – выводит полную статистику по определенному пользователю.
+<LI> <b>$www_data_path/stat/statist/total_otd.cgi</b> – выводит статистику по определенному отделу.
+<LI> <b>$www_data_path/stat/statist/chpasswd.cgi</b> – позволяет пользователям изменять пароли, для администраторов сети выводит ссылку на adduser.cgi, supasswd.cgi и update_utr.cgi.
+<LI> <b>$www_data_path/stat/statist/supasswd.cgi</b> – позволяет администраторам сети изменять пароли другим пользователям.
+<LI> <b>$www_data_path/stat/statist/adduser.cgi</b> – позволяет администраторам сети создавать новых пользователей.
+<LI> <b>$www_data_path/stat/statist/update_utr.cgi</b> – скрипт позволяет администраторам сети изменять лимит на трафик для пользователей.
+<LI> <b>$www_data_path/stat/statist/otd_ctrl.cgi</b> – позволяет начальникам отделов регулировать лимит по своим пользователям, т.е. можно увеличивать лимит трафика пользователя за счет уменьшения квоты на отдел (квота на отдел – величина использующаяся как буфер для работы с лимитами пользователей) и наоборот: уменьшая трафик пользователя увеличивать квоту на отдел.
+<LI> <b>$www_data_path/stat/statist/profile.cgi</b> – скрипт профиля пользователя.
+<LI> <b>$www_data_path/stat/statist/upduinfo.cgi</b> – скрипт обновления информации о пользователе.
+<LI> <b>$www_data_path/stat/statist/killuser.cgi</b> – скрипт удаления пользователя из системы.
+<LI> <b>$www_data_path/stat/statist/mess_view.cgi</b> – скрипт просмотра вэб-сообщений.
+<LI> <b>$www_data_path/stat/statist/mess_admin.cgi</b> – скрипт просмотра вэб-сообщений администратора STC.
+<LI> <b>$www_data_path/stat/statist/mess_send.cgi</b> – скрипт отправки вэб-сообщений.
+<LI> <b>$www_data_path/stat/statist/mess_msend.cgi</b> – скрипт массовой отправки вэб-сообщений (доступен только для администраторов).
+<LI> <b>$www_data_path/stat/statist/block.cgi</b> – позволяет заблокировать доступ в интернет всем пользователям. Пользователи перенаправляются на profil.cgi.
+<LI> <b>$www_data_path/stat/messages/limit.cgi</b> – сообщение, на которое перенаправляются все пользователи, превысившие лимит на месяц (deny.users).
+<LI> <b>$www_data_path/stat/messages/limit.cgi</b> – сообщение, на которое перенаправляются все пользователи, заблокированные администраторами системы (blocked.users).
+<LI> <b>$www_data_path/stat/messages/deny.cgi</b> – неизвестные пользователи перенаправляются сюда.
+<LI> <b>$www_data_path/stat/messages/profil.cgi</b> – сообщение «Система доступа в Интернет находится на профилактике».
+<LI> <b>$stc_path/users.log</b> – лог-файл, в который заносится информация о работе с учетными записями пользователей Интернет администраторами.
+<LI> <b>/var/log/error.log</b> – лог, в который заносится информация об инсталляции (деинсталляции) проекта и модулей.
+<LI> <b>/var/log/sarg_error.log</b> – лог, в который заносится информация о работе скриптов run_sarg, run_sarg_w.pl и run_sarg_m.pl (отчеты).
+</OL>
+Примечание.
+$имя_переменной – переменная , значение читается из stc.conf (install.conf на этапе инсталляции). 
+В stc.conf прописывается:
+$имя_переменной значение
+Например: 
+<pre>
+site_ip 172.16.191.42
+stc_path /usr/local/stc/etc
+limit_path /usr/local/stc/limit
+</pre>
+
+Строка считается комментарием, если первым символом является #.
+Подробней в комментариях в файлах stc.conf и install.conf.
+<br>
+<br>
+<br>
+<br>
+
+
+<h2><a name="19">7. Модули для STC</a></h2>
+Начинаная с версии 2.0.1 все модули встроены в систему. Для управленя модулями необходимо отредактировать файл /etc/stc.conf:
+<pre>
+skip_cache yes|no – не учитывать трафик из кэша squid’а да|нет
+exclude_hosts FILE – файл со списком IP и доменных имен (сайтов), трафик с которых не учитывается 
+</pre>
+<br>
+<br>
+
+
+<h2><a name="20">8. Обратите внимание.</a></h2>
+Некоторые советы по работе с STC:
+<UL>
+<LI> после инсталляции поменяйте пароль пользователю dummy;
+<LI> перед установкой убедитесь что у вас установлен модуль Apache-Htpasswd для перла;
+<LI> в целях безопасности владельцем следующих файлов должен быть root: admin.users;
+<LI> ошибки в работе системы пишутся в $log_file$ (см. тег log_file в /etc/stc.conf), ошибки в создании отчетов в /var/log/sarg_error.log.
+<LI> в версии stc-2.0.1 владельцем директории WWW_DATA_PATH должен быть пользователь, от которого работает apache, также он должен иметь права на запись в эту диру.
+</UL>
+
+</body>
+</html>

@@ -1,0 +1,230 @@
+#!/usr/bin/perl
+#Copyright (C) 2003  Didenko A.V.
+#created by Sergey S.S. e-Mail:brahma@ua.fm
+use Time::Local qw(timelocal);
+
+
+    open cf, "</etc/stc.conf" or die "$!";
+    while($line=<cf>){
+           chomp($line);
+           $line=~ s/#.*//;
+           $line=~ s/[\s\t]{1,}/ /;
+	   $line=~ s/^[\s\t]{0,}//;
+           if (!$line)
+                {next;}
+           @parts=split(" ", $line);
+           $var=shift(@parts);
+           @$var=@parts;
+           $$var=$parts[0];
+    }
+    close (cf);
+
+
+
+$mdays[1]=31;
+$mdays[3]=31;
+$mdays[4]=30;
+$mdays[5]=31;
+$mdays[6]=30;
+$mdays[7]=31;
+$mdays[8]=31;
+$mdays[9]=30;
+$mdays[10]=31;
+$mdays[11]=30;
+$mdays[12]=31;
+
+
+open LR, "<$SC_path/report";
+$crdate=<LR>;
+chomp($crdate);
+$last_weekly_report=<LR>;
+chomp($last_weekly_report);
+$last_monthly_report=<LR>;
+chomp($last_monthly_report);
+close LR;
+
+if (!$crdate)
+     {
+     ($cd, $cm, $cy)=(localtime)[3,4,5];
+     $now_date=make_date($cd, $cm+1, $cy+1900);
+     if ($cm<10) {$cm="0$cm";}
+     open LR, ">$SC_path/report";
+     print LR day_minus($now_date)."\n\n$cm/".($cy+1900);
+     close LR;
+     exit;
+     }
+
+($cd, $cm, $cy)=(localtime)[3,4,5];
+    ($wdate, $wmonth, $wyear) = split ("/", $crdate);
+    $wmonth--;
+    $wyear-=1900;
+    $unix=timelocal(1,1,1,$wdate,$wmonth,$wyear);
+    ($lweek_day, $wy_day)=(localtime $unix)[6,7];
+    if ($lweek_day eq 0) {$lweek_day=7;}
+    $TIME_beg = timelocal(1, 1, 1, $cd, $cm, $cy);
+$cy+=1900;
+$cm++;
+$now_date=make_date($cd, $cm, $cy);
+while ($crdate ne $now_date)
+    {
+    $crdate=day_plus($crdate);
+    ($date, $month, $year) = split ("/", $crdate);
+
+#monthly reports begin
+$mmonth--;
+if ($mmonth<10) {$mmonth="0".$mmonth;}
+    if ("$mmonth/$year" ne $last_monthly_report )
+        {
+         $time_now=localtime;
+         $rep_month=$month-1;
+	 $rep_year=$year;
+         if ($rep_month<10) {$rep_month="0$rep_month";}
+	 if (int($rep_month) eq 0) {$rep_year--; $rep_month="12"}
+	 if ("$rep_month/$rep_year" ne $last_monthly_report)
+	 {
+         open LOG, ">>/var/log/stcd.log";
+	 $bench=time;
+     system("$SC_path/generate 01/$rep_month/$rep_year-31/$rep_month/$rep_year monthly remove");
+	 $bench=time()-$bench;
+         print LOG "$time_now - generating monthly report: 01/$rep_month/$rep_year-31/$rep_month/$rep_year [took $bench seconds]\n";
+         close LOG;
+         $last_monthly_report=$rep_month."/$rep_year";
+	 }
+        }
+#monthly reports end
+
+#weekly reports begin
+    $month--;
+    $year-=1900;
+    $unix=timelocal(1,1,1,$date,$month,$year);
+    if ($unix>$TIME_beg)
+         {
+         $time_now=localtime;
+         open LOG, ">>/var/log/stcd.log";
+         print LOG "$time_now - Report generator check error. Probably endless loop. Terminating.\n";
+         close LOG;
+         }
+    ($week_day, $year_day)=(localtime $unix)[6,7];
+    if ($week_day eq 0) {$week_day=7;}
+    if ($week_day eq 1)
+#    if ($week_day<$lweek_day || ($year_day-$wy_day)>7)
+    {
+    for ($i=0; $i<$week_day; $i++)
+        {$weekly_rep_end=day_minus($crdate);}
+    $weekly_rep_beg=$crdate;
+    for ($i=0; $i<7; $i++)
+        {$weekly_rep_beg=day_minus($weekly_rep_beg);}
+    if ($last_weekly_report ne "$weekly_rep_beg-$weekly_rep_end") {
+         $time_now=localtime;
+         open LOG, ">>/var/log/stcd.log";
+	 $bench=time;
+     system("$SC_path/generate $weekly_rep_beg-$weekly_rep_end weekly");
+	 $bench=time()-$bench;
+         print LOG "$time_now - Generating weekly report $weekly_rep_beg-$weekly_rep_end [took $bench seconds]\n";
+         close LOG;
+    $last_weekly_report="$weekly_rep_beg-$weekly_rep_end";
+    $lweek_day=$week_day;
+    $wy_day=$year_day;
+	}
+    }
+# weekly reports end
+    if ($crdate eq $now_date) {next;}
+# daily reports
+    ($date, $month, $year) = split ("/", $crdate);
+     if (int($month) eq ((localtime)[4]+1) || (int($month) eq ((localtime)[4] && int($date) > 27)))
+     {
+         $time_now=localtime;
+         open LOG, ">>/var/log/stcd.log";
+	 $bench=time;
+	 system("$SC_path/generate $crdate-$crdate daily");
+	 $bench=time()-$bench;
+         print LOG "$time_now - Generating daily report $crdate [took $bench seconds]\n";
+         close LOG;
+     }
+#    sleep 1;
+    }
+open LR, ">$SC_path/report";
+print LR day_minus($crdate);
+print LR "\n$last_weekly_report";
+print LR "\n$last_monthly_report";
+close LR;
+
+sub day_plus
+    {
+    my($date)=@_;
+    my($d,$m,$y)=split("/",$date);
+if (int($y/100) eq $y/100)
+    {
+    if (int($y/400) eq $y/400)
+    {$mdays[2]=29;}
+    else
+        {$mdays[2]=28;}
+    }
+elsif (int($y/4) eq $y/4)
+    {$mdays[2]=29;}
+else
+    {$mdays[2]=28;}
+    $d++;
+    if ($d>$mdays[int($m)])
+    {
+    $d=1;
+    $m++;
+    }
+    if ($m>12)
+    {
+    $m=1;
+    $y++;
+    }
+    if ($d<10)
+        {$d="0".int($d);}
+    if ($m<10)
+    {$m="0".int($m);}
+    return ("$d/$m/$y");
+    }
+
+sub day_minus
+    {
+    my($date)=@_;
+    my($d,$m,$y)=split("/",$date);
+if (int($y/100) eq $y/100)
+    {
+    if (int($y/400) eq $y/400)
+    {$mdays[2]=29;}
+    else
+        {$mdays[2]=28;}
+    }
+elsif (int($y/4) eq $y/4)
+    {$mdays[2]=29;}
+else
+    {$mdays[2]=28;}
+    
+    $d--;
+    if ($d<1)
+    {
+    $m--;
+    if ($m<1)
+    {
+    $y--;
+    $m=12;
+    }
+    $d=$mdays[int($m)];
+    }
+    if ($d<10)
+        {$d="0".int($d);}
+    if ($m<10)
+    {$m="0".int($m);}
+    return ("$d/$m/$y");
+    }
+
+
+sub make_date
+    {
+    my ($d, $m, $y) = @_;
+    if ($d<10)
+      {$d="0$d";}
+    if ($m<10)
+      {$m="0$m";}
+    return "$d/$m/$y";
+    }
+
+

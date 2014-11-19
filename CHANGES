@@ -1,0 +1,253 @@
+STC Changes log
+###############
+
+stc-2.0.20
+    *   exclude_ip and ipv6 fix
+    *   Added some additional checks for o<unit_number>.users files creation
+    *   Added STC updates availability check (shown on admin.cgi page), requires LWP::Simple perl module
+    *   Minor code optimization in dpools.cgi
+
+stc-2.0.19
+    *   messages cgi scripts bugfixes, language files update
+    *   Added snAke666' patch, new TAG: allow_deny_files_by_otdels
+
+stc-2.0.18
+    *   Bugfixes and some typo fixes
+
+stc-2.0.17
+    *   A lot of bugfixes
+    *   New script: perm_fixer.pl - fixes ownership/perms for some files/dirs
+
+stc-2.0.16
+    *   BUGFIX: rotate.pl loggin timestamp fix
+    *   BUGFIX: get_traffic() fix in init_stc.pl
+
+stc-2.0.15
+    *   Permissions fix in STC tarball
+    *   serverstat.cgi now longer needs additional changes in squid.conf file
+
+stc-2.0.14
+    *   Small fix for web-navigation in reports section (now it supports both http:// and https://)
+    *   Added Logout feature in web-interface
+    *   Added SARG images so now reports display SARG HTML code and diagrams correctly
+
+stc-2.0.13
+    *   Some web-navigations improvements, theme adjustment, fixes, etc
+
+stc-2.0.12
+    *   Fix in limit.inc to handle some crazy URLs :)
+
+stc-2.0.11
+    *   Applied small fix to provide Apache::Htpasswd 1.8 and above compatibility. Scripts updated: user_mod.cgi, supasswd.cgi
+
+stc-2.0.10
+    *	Script updated: chpasswd.cgi, init_stc.pl - show unit name instead of number on "Profile" page
+
+stc-2.0.9
+    *	Fixed some bugs
+    *	Added squid-2.6 support to dpools.cgi
+    *	Added support for sarg2 - not really tested :)
+    *	Known issues: still have some problems with reports (view.cgi)
+
+stc-2.0.8
+    *	New TAG: header_text and footer_text
+    *	Delete TAG: admin_contact_phone
+    *	Script updated: generate, adduser.cgi, dpools.cgi, serverstat.cgi, block.cgi, update_utr.cgi, monthly_rotate
+    *	Script monthly_rotate will remove access.log.m[1-12] log file from previous year
+    *	LANG file updated
+
+stc-2.0.7
+    *	Fixed BUG with unit reports creation
+    *	Updates in WWW_DATA_PATH/stat/statist/init_stc.pl
+    *	New theme: 'silver' by Slivarez ;-)
+    *	New TAG: admin_contact_phone - you know what to do with it ;-)
+    
+stc-2.0.6
+    *	Fixed BUG in view.cgi. Now Internet Explorer displays SARG-2.0.x reports correctly
+    *	Added sarg_graph.pl script. It allows to view SARG-2.0.x graphics in reports
+    *	Script updated: install, init_stc.pl, generate, statistic.cgi, serverstat.cgi, bosses.cgi
+    *	Small fixes: st.cgi, st_ip.cgi
+    *	LANG file updated
+    *   New TAG: serverstat_type 1|2
+
+stc-2.0.5
+    *   Fixed BUG in LIMIT_PATH/allowusers.pl (only multidomain NTLM affected)
+    *   Fixed BUG in SARG/generate script, now it removes DAILY and WEEKLY reports
+    *   WWW_DATA_PATH/messages/*.cgi scripts updated
+    *   Added new styles for SARG2 reports
+    *   Some minor optimizations
+
+stc-2.0.4
+    *   Fixed small bug in admin.cgi
+    *	Fixed a lot of small bugs in many scripts (found by Igor-itl)
+    *   Fixed BUGs in LIMIT scripts (only multidomain NTLM affected)
+    *   New TAG: ntlm_userdomain userfirst|domainfirst
+    *   Some minor optimizations
+
+stc-2.0.3
+    *   Fixed BUGs in install script (+ install is on English now)
+    *   Fixed small BUG in WWW_DATA_PATH/stat/statist/update_utr.cgi
+    *   New script stc-2.0.3/scripts/chkdirs.pl - will check and fix dirs
+
+stc-2.0.2
+    *   Fixed BUG in stat script
+    *   Script updated: install, init_stc.pl
+
+stc-2.0.1 - 02.09.2005
+    *	Bandwidth control (dpools.cgi) bugs fixed
+    *	LANG files updated
+    *	boss.cgi script updated
+
+stc-2.0.1 vs stc-2.0.1-beta
+    *	GENERAL: 'Squid reconf' button added (dpools.cgi)
+    *	Updated scripts: up2date.pl, stat, drop_conn.pl, view.cgi, dpools.cgi, generate.pl, statistic.cgi
+    *	Fixed sarg reports output bug
+    *	Doc renamed to manual.html and updated
+
+stc-2.0.1-beta - 25.08.2005
+    *   GENERAL: added support for sarg2 reports format
+    *   New TAG: 'sarg_version'
+    *   view.cgi updated (added support for sarg_version)
+
+stc-2.0.1-beta - 19.08.2005
+    *   Some updates in install script
+
+stc-2.0.1-beta - 18.08.2005
+    *   Fixed BUGs in install script
+    *   Fixed typos in english.lng file
+    *   Documentation update (_doc/doc-2.0.html - russian)
+    *   Updated scripts: update.pl up2date.pl
+    *   New directory added: scripts - you can find some usefull script here
+    *   New script: scripts/fixperms.pl - fix permissions
+
+stc-2.0.1-beta - 15.08.2005
+    *   Fixed BUG in install script: wrong permissions on CGI scripts
+    *   Fixed BUG in chpasswd.cgi
+
+stc-2.0.1-beta - 14.08.2005
+    *   Some security updates in CGI scripts
+
+stc-2.0.1-beta - 12.08.2005
+    *   Fixed bugs in view.cgi script
+    
+stc-2.0.1-beta - 03.08.2005
+    *   Script install updated: 'nice -19' changed to 'nice -n -19'
+
+stc-2.0.1-beta - 02.08.2005
+    *   Fixed another stupid error in view.cgi :-)
+    
+stc-2.0.1-beta - 01.08.2005
+    *   Fixed stupid error in rotate.pl
+
+stc-2.0.1-beta - 22.07.2005
+    *   Typo fixes :-)
+
+stc-2.0.1-beta - 16.07.2005
+    *   LIMIT and CGI scripts updated (some NTLM related updates).
+    *   rotate.pl and copy_log.pl - `head -1` and `tail -1` changed to 
+        `head -n 1` and `tail -n 1`
+
+stc-2.0.1-beta - 10.07.2005
+    *	dpools.cgi updated (now it works under stc-2.0.1-beta)
+    *	Small fixes: reset_conn.pl, init_stc.pl, userstat.pl
+
+stc-2.0.1-beta - 08.07.2005
+    *   Fixed error in LIMI_PATh/stat script (wrong path to drop_conn.pl)
+
+stc-2.0.1-beta - 27.06.2005
+    *	Fixed small typo in russian LANG files
+    *	New webmodule added - wm_vrn_light
+    *	All webmodules updated
+    *	Some minor updates in CGI scripts
+    *	chpasswd.cgi updated, now it allows users to change their interface
+    *	Fixed critical errors in update.pl and up2date.pl
+    *	New TAG - exclude_codes - see stc.conf (install.conf) for details
+
+stc-2.0.1-beta - 26.06.2005
+    *	Fixed bug in update.pl (make_profiles.pl) scripts
+    
+stc-2.0.1-beta - 25.06.2005
+    *	New TAGs 'skip_cache' and 'drop_connections' (see _doc/drop_connections.txt)
+    *	Drop connections for squid+extacclog_patch added
+    *	Documentation updated
+    *	stc-2.0.1-beta/etc/apache_stc.conf updated
+    *	Major update of up2date.pl script (now it's in LIMIT_PATH)
+
+stc-2.0.1-beta - 15.06.2005
+    *	Fixed bug in rotate.pl
+    
+stc-2.0.1-beta - 11.06.2005
+    *	Update CGI scripts to allow work with VirtualHost (http://.../~USER/)
+    *	New sample config (VirtualHost for apache):
+	    stc-2.0.1-beta/etc/apache_stc.conf
+    *	New TAG service_to_reconf (see install.conf for details)
+    *	Updated LIMIT script 'stat' (added support for TAG service_to_reconf)
+    *	Updated up2date.pl script (added one option and help "-h" or "--help")
+    
+stc-2.0.1-beta vs stc-2.0
+    *	UNSTABLE RELEASE!!!
+    *	TOO MANY CHANGES... SKIPPING.. ;-)
+
+stc-2.0 vs stc-1.3.1
+    *	New scripts:
+	    LIMIT_PATH/reset_queue.pl - read connection termination queue
+	    LIMIT_PATH/reset_conn.pl - terminates connections, read by reset_queue.pl script
+	    WWW_DATA_PATH/stat/statist/serverstat.cgi - server statistics, active erquests,
+		writing into termination queue...
+    *	New perl module - hijack_stc.pm - connection termination staff
+    *	New DIR - STC_PATH/includes/ - includes directory.
+    *	New DIR - STC_PATH/lang/ - language files directory.
+    *	New TAG - reports_dir - directory for sarg reports.
+    *	New scripts:
+	    WWW_DATA_PATH/stat/statist/init_stc.pl - read /etc/stc.conf and public functions
+	    WWW_DATA_PATH/stat/statist/view.cgi - viewing reports
+	    WWW_DATA_PATH/stat/statist/dpools.cgi - delay_pools control
+    *	Changes in all *.cgi scripts.
+    *	Changes in all stc-1.3.1/sarg/* scripts.
+    *	Unnecessary scripts: SC_PATH/user_rep_*.pl
+
+stc-1.3.1 - 30.06.2004
+    *	Fixed bug in script rotate.sh
+
+stc-1.3.1 - 22.06.2004
+    *	Fixed bug in script upduinfo.cgi
+    *	New TAGs in stc.conf (install.conf) - apache_user, apache_group
+
+stc-1.3.1 - 24.05.2004
+    * 	Changes in install.conf (syntax error in TAG description)
+    * 	Error in install script (user_rep_*.pl scripts don't work, 
+	due to errors in /etc/crontab) - FIXED
+    
+stc-1.3.1 - 18.05.2004
+    * Changes in scripts: profile.cgi, st.cgi, st_ip.cgi
+
+stc-1.3.1 - 17.05.2004
+    * Fixed error in script stc-1.3.1/_modules/linux_rep_mod-1.2.8
+    * Some documentation changes
+    
+stc-1.3.1 - 07.05.2004
+    * New Documentation.
+    * Changes in scripts: install, update_from_1.3.X
+
+stc-1.3.1 - 06.05.2004
+    * Better security in cgi scripts
+
+
+stc-1.3.1 vs stc-1.3.0
+    ***** 1 *****
+    NEW (1.3.1):
+        squidGuard.conf.allow|squidGuard.conf.profil:
+    >	dest local_site {
+    >		domainlist $stc_path/local.domains
+    >	}
+
+    OLD (1.3.0|1.3.1-pre*):
+        squidGuard.conf.allow|squidGuard.conf.profil:
+    >	dest local_site {
+    >		urllist $stc_path/local.urls
+    >	}
+
+    ***** 2 *****
+    NEW-FILE (1.3.1) - local.domains
+    OLD-FILE (1.3.0) - local.urls
+    SOLUTION - mv local.urls local.domains
