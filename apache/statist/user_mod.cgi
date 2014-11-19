@@ -112,7 +112,14 @@ if ($query->param(mod_user))
         if ($newpass)
             {
             $pass_path="$conf_stc_path/password";
-            $ap_htpass=new Apache::Htpasswd($pass_path);
+            if ($conf_htpasswd_usemd5 eq 'true') {
+                $ap_htpass=new Apache::Htpasswd({
+                    passwdFile => $pass_path,
+                    UseMD5     => 1,
+                });
+            } else {
+                $ap_htpass=new Apache::Htpasswd($pass_path);
+            }
             $ap_htpass->htpasswd($usver, $newpass, {'overwrite' => 1});
 
             &del_from_file ("${conf_stc_path}/password.digest", $usver);

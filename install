@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-#created by Didenko A.V. e-Mail:didenych@ukr.net
+#created by Didenko A.V. e-Mail: slivarez@gmail.com
 
 use Time::localtime;
 use File::Copy cp;
@@ -270,7 +270,14 @@ system("echo Creating user dummy>> $log_install");
 
 system("touch $stc_path/password >>$log_install 2>&1");
 $pass_path="$stc_path/password";
-$ap_htpass=new Apache::Htpasswd($pass_path);
+if ($htpasswd_usemd5 eq 'true') {
+    $ap_htpass=new Apache::Htpasswd({
+        passwdFile => $pass_path,
+        UseMD5     => 1,
+    });
+} else {
+    $ap_htpass=new Apache::Htpasswd($pass_path);
+}
 $ap_htpass->htpasswd("dummy", "dummypass");
 
 system("chown $apache_user:$squid_group $stc_path/password >> $log_install 2>&1");

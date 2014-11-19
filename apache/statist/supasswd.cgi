@@ -50,7 +50,16 @@ $back_url=$query->param('back_url');
 if (!safe_url($back_url, 'supasswd.cgi')){goto l1;}
 
 if(($newpass ne '') and ($newpass eq $repass)){
-    $pas = new Apache::Htpasswd("$conf_stc_path/password");
+
+    if ($conf_htpasswd_usemd5 eq 'true') {
+        $pas = new Apache::Htpasswd({
+            passwdFile => "$conf_stc_path/password",
+            UseMD5     => 1,
+        });
+    } else {
+        $pas = new Apache::Htpasswd("$conf_stc_path/password");
+    }
+
     $pas->htpasswd($usver, $newpass, {'overwrite' => 1});
 
     my $logfile="$conf_stc_path/password.digest";

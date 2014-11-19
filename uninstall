@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-#created by Didenko A.V. e-Mail:didenych@ukr.net
+#created by Didenko A.V. e-Mail: slivarez@gmail.com
 
 use Time::localtime;
 use File::Copy cp;

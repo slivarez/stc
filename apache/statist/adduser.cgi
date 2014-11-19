@@ -129,7 +129,16 @@ print "Adding user $usver to otdel $otdel<br>";
             }
             if ($err ne "gluk"){
             $pass_path="$conf_stc_path/password";
-            $ap_htpass=new Apache::Htpasswd($pass_path);
+
+            if ($conf_htpasswd_usemd5 eq 'true') {
+                $ap_htpass = new Apache::Htpasswd({
+                    passwdFile => $pass_path,
+                    UseMD5     => 1,
+                });
+            } else {
+                $ap_htpass = new Apache::Htpasswd($pass_path);
+            }
+
             $ap_htpass->htpasswd($usver, $newpass);
 #                system ("$conf_stc_path/htpasswd -b $conf_stc_path/password $usver $newpass");
 

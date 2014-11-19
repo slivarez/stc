@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 #
 # Script for updating STC from current distr
-#created by Didenko A.V. e-Mail:didenych@ukr.net
+#created by Didenko A.V. e-Mail: slivarez@gmail.com
 
 
 use Time::localtime;

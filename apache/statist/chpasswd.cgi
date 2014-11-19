@@ -46,7 +46,16 @@ $chpasswd=$query->param(chpasswd);
 
 if ($chpasswd){
   if(($newpass ne '') and ($newpass eq $repass)){
-    $pas = new Apache::Htpasswd("$conf_stc_path/password");
+
+    if ($conf_htpasswd_usemd5 eq 'true') {
+        $pas = new Apache::Htpasswd({
+            passwdFile => "$conf_stc_path/password",
+            UseMD5     => 1,
+        });
+    } else {
+        $pas = new Apache::Htpasswd("$conf_stc_path/password");
+    }
+
     $check_pass=$pas->htCheckPassword($user, $oldpass);
     if ($check_pass == 1){
        $check_pass=$pas->htpasswd($user, $newpass, $oldpass);
