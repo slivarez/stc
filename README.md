@@ -1,0 +1,4 @@
+stc
+===
+
+Squid Traffic Counter
