@@ -33,7 +33,7 @@ $query = new CGI;
 $picfile = $query->param(pic);
 
 $type="image/png"; # type of returning content
-#$picfile =~ s/\.\.//ig;
+$picfile =~ s/\.\.//ig;
 $file = $coren."/".$picfile;
 
 open(IMGF, $file) or die "cannot open file: ".$file."\n"; # if open fails, it will be logged by apache

@@ -195,6 +195,11 @@ if ($sarg_version == 2){
 
   s/class\=\"body\"//ig; # I think thise will be right because I have already drop style from <body>, but I don't sure...
   s/class\=\"/class\=\"sarg2\_/ig;
+
+# Graph img link workaround
+  $graph_find = "<img src=\"(graph_.*.png)\"";
+  $graph_replace = '"<img src=sarg_graph.pl?pic='.$start_usver.'$1"';
+  s/$graph_find/$graph_replace/eeig;
   
 # At thise point I fix paths to <img src = ... It works only if all used by SARG 2 pictures
 # placed to /stat/images directory
