@@ -204,7 +204,8 @@ if ($sarg_version == 2){
 # At thise point I fix paths to <img src = ... It works only if all used by SARG 2 pictures
 # placed to /stat/images directory
 
-  s/\<img src\=\".*\/images\//\<img src\=\"\.\.\/images\//ig;
+  s/\<img src\=\"[^"]+\/images\//\<img src\=\"\.\.\/images\//ig;
+  s/\<img src="images\//\<img src="..\/images\//ig;
 
 }
 
